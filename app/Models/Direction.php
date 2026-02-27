@@ -13,8 +13,8 @@ class Direction extends Model
         return $this->belongsTo(Ville::class, 'id_ville');
     }
 
-    public function servics()
+    public function services()
     {
-        return $this->hasMany(Servic::class, 'id_direction');
+        return $this->hasMany(Service::class, 'id_direction');
     }
 }

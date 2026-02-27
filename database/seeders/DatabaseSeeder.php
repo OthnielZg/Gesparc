@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Ville;
 use App\Models\Direction;
-use App\Models\Servic;
+use App\Models\Service;
 use App\Models\Bureau;
 use App\Models\Fournisseur;
 use Illuminate\Database\Seeder;
@@ -27,12 +27,12 @@ class DatabaseSeeder extends Seeder
         $dsi = Direction::create(['nom_direction' => 'Direction des Systèmes d\'Information', 'id_ville' => $plateau->id]);
 
         // 3. Services
-        $dev = Servic::create(['nom_servic' => 'Développement', 'id_direction' => $dsi->id]);
-        $support = Servic::create(['nom_servic' => 'Support & Maintenance', 'id_direction' => $dsi->id]);
+        $dev = Service::create(['nom_service' => 'Développement', 'id_direction' => $dsi->id]);
+        $support = Service::create(['nom_service' => 'Support & Maintenance', 'id_direction' => $dsi->id]);
 
         // 4. Bureaux
-        $bureauDev1 = Bureau::create(['nom_bureau' => 'Bureau Dev 1', 'id_servic' => $dev->id]);
-        $bureauSupport1 = Bureau::create(['nom_bureau' => 'Bureau Support 1', 'id_servic' => $support->id]);
+        $bureauDev1 = Bureau::create(['nom_bureau' => 'Bureau Dev 1', 'id_service' => $dev->id]);
+        $bureauSupport1 = Bureau::create(['nom_bureau' => 'Bureau Support 1', 'id_service' => $support->id]);
 
         // 5. Fournisseurs
         Fournisseur::create([

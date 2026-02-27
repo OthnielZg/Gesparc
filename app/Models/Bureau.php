@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Bureau extends Model
 {
     protected $table = 'bureaux';
-    protected $fillable = ['nom_bureau', 'id_servic'];
+    protected $fillable = ['nom_bureau', 'id_service'];
 
-    public function servic()
+    public function service()
     {
-        return $this->belongsTo(Servic::class, 'id_servic');
+        return $this->belongsTo(Service::class, 'id_service');
     }
 
     public function utilisateurs()

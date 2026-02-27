@@ -42,11 +42,11 @@
                                     
                                     <!-- Services in this Direction -->
                                     <div class="ml-2 pl-3 border-l border-gray-200 mt-2 space-y-2">
-                                        @foreach($dir->servics as $srv)
+                                        @foreach($dir->services as $srv)
                                             <div class="flex justify-between items-center group/srv">
-                                                <span class="text-[10px] text-gray-500 font-medium">{{ $srv->nom_servic }}</span>
+                                                <span class="text-[10px] text-gray-500 font-medium">{{ $srv->nom_service }}</span>
                                                 <div class="flex gap-2">
-                                                    <button @click="openModal = 'bureau'; targetId = {{ $srv->id }}; targetName = '{{ $srv->nom_servic }}'" class="opacity-0 group-hover/srv:opacity-100 text-ci-green text-[10px]"><i class="fa-solid fa-plus"></i></button>
+                                                    <button @click="openModal = 'bureau'; targetId = {{ $srv->id }}; targetName = '{{ $srv->nom_service }}'" class="opacity-0 group-hover/srv:opacity-100 text-ci-green text-[10px]"><i class="fa-solid fa-plus"></i></button>
                                                 </div>
                                             </div>
                                             <!-- Bureaux list snippet -->
@@ -115,7 +115,7 @@
                         <input type="hidden" name="id_direction" :value="targetId">
                         <h4 class="text-xl font-black mb-2 uppercase tracking-tighter">Nouveau Service</h4>
                         <p class="text-xs text-gray-400 mb-6 uppercase font-bold tracking-widest" x-text="'DANS : ' + targetName"></p>
-                        <input type="text" name="nom_servic" required class="w-full p-4 bg-gray-50 border-0 rounded-2xl text-sm mb-6" placeholder="ex: Service Moyens Généraux">
+                        <input type="text" name="nom_service" required class="w-full p-4 bg-gray-50 border-0 rounded-2xl text-sm mb-6" placeholder="ex: Service Moyens Généraux">
                         <div class="flex gap-4">
                             <button type="button" @click="openModal = null" class="flex-1 py-3 text-gray-500 font-bold">Annuler</button>
                             <button type="submit" class="flex-1 py-3 bg-ci-orange text-white rounded-xl font-black shadow-lg">Ajouter</button>
@@ -126,7 +126,7 @@
                 <template x-if="openModal === 'bureau'">
                     <form action="{{ route('admin.organisation.bureau.store') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="id_servic" :value="targetId">
+                        <input type="hidden" name="id_service" :value="targetId">
                         <h4 class="text-xl font-black mb-2 uppercase tracking-tighter">Nouveau Bureau</h4>
                         <p class="text-xs text-gray-400 mb-6 uppercase font-bold tracking-widest" x-text="'DANS : ' + targetName"></p>
                         <input type="text" name="nom_bureau" required class="w-full p-4 bg-gray-50 border-0 rounded-2xl text-sm mb-6" placeholder="ex: Bureau 402">

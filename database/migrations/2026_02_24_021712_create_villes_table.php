@@ -21,9 +21,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('servics', function (Blueprint $table) {
+        Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('nom_servic', 100);
+            $table->string('nom_service', 100);
             $table->foreignId('id_direction')->constrained('directions')->cascadeOnDelete();
             $table->timestamps();
         });
@@ -31,7 +31,7 @@ return new class extends Migration
         Schema::create('bureaux', function (Blueprint $table) {
             $table->id();
             $table->string('nom_bureau', 100);
-            $table->foreignId('id_servic')->constrained('servics')->cascadeOnDelete();
+            $table->foreignId('id_service')->constrained('services')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -39,7 +39,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('bureaux');
-        Schema::dropIfExists('servics');
+        Schema::dropIfExists('services');
         Schema::dropIfExists('directions');
         Schema::dropIfExists('villes');
     }

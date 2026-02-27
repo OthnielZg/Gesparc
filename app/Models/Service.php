@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Servic extends Model
+class Service extends Model
 {
-    protected $table = 'servics';
-    protected $fillable = ['nom_servic', 'id_direction'];
+    protected $table = 'services';
+    protected $fillable = ['nom_service', 'id_direction'];
 
     public function direction()
     {
@@ -16,6 +16,6 @@ class Servic extends Model
 
     public function bureaux()
     {
-        return $this->hasMany(Bureau::class, 'id_servic');
+        return $this->hasMany(Bureau::class, 'id_service');
     }
 }

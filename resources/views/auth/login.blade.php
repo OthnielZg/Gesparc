@@ -4,7 +4,7 @@
         <!-- Left Section: Image (Hidden on small mobile if needed) -->
         <div class="relative md:w-1/2 lg:w-3/5 h-64 md:h-auto overflow-hidden">
             <!-- Note: Using absolute path to existing assets for now or placeholder if not found -->
-            <img src="{{ asset('img/bg-login.jpg') }}" 
+            <img src="{{ asset('images/bg_dgi.jpg') }}" 
                  alt="DGI Background" 
                  class="absolute inset-0 w-full h-full object-cover object-[center_25%]">
             
@@ -28,7 +28,7 @@
             <div class="w-full max-w-md">
                 <!-- Logo & Title -->
                 <div class="text-center mb-8">
-                    <img src="{{ asset('img/logo_dgi.png') }}" alt="Logo DGI" class="h-20 mx-auto mb-6 drop-shadow-sm">
+                    <img src="{{ asset('images/logo_dgi.png') }}" alt="Logo DGI" class="h-20 mx-auto mb-6 drop-shadow-sm">
                     <h1 class="text-2xl font-black text-gray-900 tracking-tighter uppercase">
                         Connexion au Portail
                     </h1>
@@ -107,7 +107,6 @@
 
                 <div class="mt-12 pt-8 border-t border-gray-100 flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                     <span>© {{ date('Y') }} DGI - CI</span>
-                    <span class="text-ci-green">GESPARC v1.0</span>
                 </div>
             </div>
         </div>

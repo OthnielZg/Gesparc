@@ -43,7 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('organisation/direction', [OrganisationController::class, 'storeDirection'])->name('organisation.direction.store');
         Route::delete('organisation/direction/{direction}', [OrganisationController::class, 'destroyDirection'])->name('organisation.direction.destroy');
         Route::post('organisation/service', [OrganisationController::class, 'storeService'])->name('organisation.service.store');
-        Route::delete('organisation/service/{servic}', [OrganisationController::class, 'destroyService'])->name('organisation.service.destroy');
+        Route::delete('organisation/service/{service}', [OrganisationController::class, 'destroyService'])->name('organisation.service.destroy');
         Route::post('organisation/bureau', [OrganisationController::class, 'storeBureau'])->name('organisation.bureau.store');
         Route::delete('organisation/bureau/{bureau}', [OrganisationController::class, 'destroyBureau'])->name('organisation.bureau.destroy');
     });
