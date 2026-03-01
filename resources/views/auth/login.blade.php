@@ -6,7 +6,7 @@
             <!-- Note: Using absolute path to existing assets for now or placeholder if not found -->
             <img src="{{ asset('images/bg_dgi.jpg') }}" 
                  alt="DGI Background" 
-                 class="absolute inset-0 w-full h-full object-cover object-[center_25%]">
+                 class="absolute inset-0 w-full h-full object-cover object-[center_25%] animate-slow-zoom">
             
             <!-- Overlay with DGI Colors -->
             <div class="absolute inset-0 bg-gradient-to-br from-[#009E60]/60 to-slate-900/80 mix-blend-multiply"></div>
@@ -54,7 +54,7 @@
 
                     <!-- Email Address -->
                     <div class="relative group">
-                        <label for="email" class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block transition-colors group-focus-within:text-ci-green">
+                        <label for="email" class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block transition-colors group-focus-within:text-ci-orange">
                             Email professionnel
                         </label>
                         <div class="relative">
@@ -62,14 +62,14 @@
                                 <i class="fa-solid fa-envelope text-xs"></i>
                             </span>
                             <input id="email" type="email" name="email" :value="old('email')" required autofocus autocomplete="username"
-                                class="block w-full pl-10 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-2xl transition-all outline-none text-sm font-bold shadow-sm"
+                                class="block w-full pl-10 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-ci-orange focus:ring-ci-orange focus:bg-white rounded-2xl transition-all outline-none text-sm font-bold shadow-sm"
                                 placeholder="votre.nom@dgi.ci">
                         </div>
                     </div>
 
                     <!-- Password -->
-                    <div class="relative group mt-4">
-                        <label for="password" class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block transition-colors group-focus-within:text-ci-green">
+                    <div class="relative group mt-4 "x-data="{ show: false }">
+                        <label for="password" class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block transition-colors group-focus-within:text-ci-orange">
                             Mot de passe
                         </label>
                         <div class="relative">
@@ -77,15 +77,21 @@
                                 <i class="fa-solid fa-lock text-xs"></i>
                             </span>
                             <input id="password" type="password" name="password" required autocomplete="current-password"
-                                class="block w-full pl-10 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-2xl transition-all outline-none text-sm font-bold shadow-sm"
-                                placeholder="••••••••">
+                                class="block w-full pl-10 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-ci-orange focus:ring-ci-orange focus:bg-white rounded-2xl transition-all outline-none text-sm font-bold shadow-sm"
+                                placeholder="••••••••" :type="show ? 'text' : 'password'">
+                            <!-- Bouton Œil magique -->
+                            <button type="button" 
+                                    @click="show = !show" 
+                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-ci-orange focus:outline-none transition-colors">
+                                <i id="eye-icon" class="fa-solid fa-eye text-sm" :class="show ? 'fa-eye' : 'fa-eye-slash'"></i>
+                            </button>
                         </div>
                     </div>
 
                     <!-- Remember Me -->
                     <div class="block mt-4 flex items-center justify-between">
                         <label for="remember_me" class="inline-flex items-center">
-                            <input id="remember_me" type="checkbox" class="rounded-lg border-gray-300 text-ci-green shadow-sm focus:ring-ci-green" name="remember">
+                            <input id="remember_me" type="checkbox" class="rounded-lg border-gray-300 text-ci-orange shadow-sm focus:ring-ci-orange" name="remember">
                             <span class="ms-2 text-xs font-bold text-gray-500 uppercase tracking-widest">{{ __('Se souvenir de moi') }}</span>
                         </label>
 

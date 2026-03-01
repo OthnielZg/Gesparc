@@ -11,9 +11,22 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                'ci-orange': '#FF6600',
+                'ci-green': '#009E60',
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            keyframes: {
+                'slow-zoom': {
+                    '0%, 100%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.05)' },
+                }
+            },
+            animation: {
+                'slow-zoom': 'slow-zoom 20s ease-in-out infinite',
+            }
         },
     },
 
