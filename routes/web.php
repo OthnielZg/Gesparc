@@ -1,17 +1,16 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\MaterielController;
-use App\Http\Controllers\DemandeController;
-use App\Http\Controllers\AffectationController;
-use App\Http\Controllers\ValidationController;
-
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FournisseurController;
 use App\Http\Controllers\Admin\OrganisationController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AffectationController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemandeController;
+use App\Http\Controllers\MaterielController;
+use App\Http\Controllers\MonMaterielController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ValidationController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -20,12 +19,14 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('materiels', MaterielController::class);
-    
+
     Route::resource('demandes', DemandeController::class);
     Route::post('demandes/{demande}/officialise', [DemandeController::class, 'officialise'])->name('demandes.officialise');
 
     Route::get('validations', [ValidationController::class, 'index'])->name('validations.index');
     Route::post('validations/{demande}', [ValidationController::class, 'store'])->name('validations.store');
+
+    Route::get('mon-materiel', [MonMaterielController::class, 'index'])->name('mon-materiel.index');
 
     Route::get('affectations', [AffectationController::class, 'index'])->name('affectations.index');
     Route::get('affectations/{affectation}/download', [AffectationController::class, 'download'])->name('affectations.download');
@@ -34,9 +35,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', UserController::class);
         Route::post('users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle');
-        
+
         Route::resource('fournisseurs', FournisseurController::class);
-        
+
         Route::get('organisation', [OrganisationController::class, 'index'])->name('organisation.index');
         Route::post('organisation/ville', [OrganisationController::class, 'storeVille'])->name('organisation.ville.store');
         Route::delete('organisation/ville/{ville}', [OrganisationController::class, 'destroyVille'])->name('organisation.ville.destroy');

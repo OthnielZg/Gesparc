@@ -4,10 +4,71 @@
 
     <!-- Navigation -->
     <nav class="flex-1 px-4 py-8 space-y-2">
+        <!-- Section: Personnel -->
+        <div class="pb-2">
+            <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Personnel</p>
+        </div>
         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="fa-chart-pie">
             Tableau de bord
         </x-nav-link>
+        <x-nav-link :href="route('demandes.index')" :active="request()->routeIs('demandes.index')" icon="fa-file-invoice">
+            {{ Auth::user()->hasRole('agent') ? 'Mes Demandes' : 'Suivi des Dossiers' }}
+        </x-nav-link>
+        @if(Auth::user()->hasRole(['agent', 'chef_cdi', 'DR']))
+            <x-nav-link :href="route('mon-materiel.index')" :active="request()->routeIs('mon-materiel.*')" icon="fa-laptop">
+                @php
+                    echo match(Auth::user()->role) {
+                        'agent'    => 'Mon Matériel',
+                        'chef_cdi' => 'Matériels de mon Service',
+                        'DR'       => 'Parc de ma Direction',
+                        default    => 'Mon Matériel',
+                    };
+                @endphp
+            </x-nav-link>
+        @endif
 
+        <!-- Section: Validations (Contextual based on role) -->
+        @if(Auth::user()->hasRole(['chef_cdi', 'DR', 'gestionnaire', 'SDREVT', 'DSI']))
+            <div class="pt-6 pb-2">
+                <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Validations</p>
+            </div>
+            
+            @if(Auth::user()->hasRole('chef_cdi'))
+                <x-nav-link :href="route('demandes.index', ['statut' => 'pre_demande'])" :active="request()->fullUrlIs(route('demandes.index', ['statut' => 'pre_demande']))" icon="fa-file-circle-check">
+                    Officialisation
+                </x-nav-link>
+            @endif
+
+            @if(Auth::user()->hasRole(['DR', 'gestionnaire', 'SDREVT', 'DSI']))
+                <x-nav-link :href="route('validations.index')" :active="request()->routeIs('validations.*')" icon="fa-check-double">
+                    @php
+                        $label = match(Auth::user()->role) {
+                            'DR' => 'Validation DR',
+                            'gestionnaire' => 'Dotation Matériel',
+                            'SDREVT' => 'Validation SDREVT',
+                            'DSI' => 'Validation Finale DSI',
+                            default => 'Mes Validations'
+                        };
+                    @endphp
+                    {{ $label }}
+                </x-nav-link>
+            @endif
+        @endif
+
+        <!-- Section: Inventaire (Gestionnaires & Admin) -->
+        @if(Auth::user()->hasRole(['admin', 'gestionnaire']))
+            <div class="pt-6 pb-2">
+                <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Inventaire</p>
+            </div>
+            <x-nav-link :href="route('materiels.index')" :active="request()->routeIs('materiels.*')" icon="fa-laptop">
+                Matériels
+            </x-nav-link>
+            <x-nav-link :href="route('affectations.index')" :active="request()->routeIs('affectations.*')" icon="fa-hand-holding-hand">
+                Affectations
+            </x-nav-link>
+        @endif
+
+        <!-- Section: Administration (Admin only) -->
         @if(Auth::user()->hasRole(['admin']))
             <div class="pt-6 pb-2">
                 <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Administration</p>
@@ -22,30 +83,6 @@
                 Fournisseurs
             </x-nav-link>
         @endif
-
-        <div class="pt-6 pb-2">
-            <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Gestion</p>
-        </div>
-        <x-nav-link :href="route('materiels.index')" :active="request()->routeIs('materiels.*')" icon="fa-laptop">
-            Matériels
-        </x-nav-link>
-
-        <div class="pt-6 pb-2">
-            <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Flux</p>
-        </div>
-        <x-nav-link :href="route('demandes.index')" :active="request()->routeIs('demandes.*')" icon="fa-file-invoice">
-            Demandes
-        </x-nav-link>
-        
-        @if(Auth::user()->hasRole(['DR', 'gestionnaire', 'SDREVT', 'DSI']))
-            <x-nav-link :href="route('validations.index')" :active="request()->routeIs('validations.*')" icon="fa-check-double">
-                Validations
-            </x-nav-link>
-        @endif
-
-        <x-nav-link :href="route('affectations.index')" :active="request()->routeIs('affectations.*')" icon="fa-hand-holding-hand">
-            Affectations
-        </x-nav-link>
     </nav>
 
     <!-- Footer Logout Area -->

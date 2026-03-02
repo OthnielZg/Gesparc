@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Demande;
-use App\Models\Validation;
-use App\Models\Materiel;
 use App\Models\Affectation;
+use App\Models\Demande;
+use App\Models\Materiel;
+use App\Models\Validation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,11 +27,11 @@ class ValidationController extends Controller
 
         $targetStatus = $statusMap[$user->role] ?? null;
 
-        if (!$targetStatus) {
+        if (! $targetStatus) {
             return redirect()->route('demandes.index');
         }
 
-        $demandes = Demande::where('statut', $targetStatus)->with('utilisateur')->latest()->paginate(10);
+        $demandes = Demande::where('statut', $targetStatus)->with(['utilisateur.bureau.service'])->latest()->paginate(10);
 
         return view('validations.index', compact('demandes'));
     }
@@ -62,6 +62,7 @@ class ValidationController extends Controller
             if ($validated['decision'] === 'KO') {
                 $demande->statut = ($user->role === 'DSI') ? 'annulee' : 'rejetee';
                 $demande->save();
+
                 return redirect()->route('demandes.show', $demande)->with('error', 'La demande a été rejetée/annulée.');
             }
 
@@ -85,6 +86,7 @@ class ValidationController extends Controller
             }
 
             $demande->save();
+
             return redirect()->route('demandes.show', $demande)->with('success', 'Validation enregistrée avec succès.');
         });
     }
@@ -93,11 +95,11 @@ class ValidationController extends Controller
     {
         // Try to find the proposed material or first available of the category
         $materiel = Materiel::where('numero_serie', $demande->materiel_propose)->first();
-        
-        if (!$materiel) {
+
+        if (! $materiel) {
             $materiel = Materiel::where('categorie', $demande->categorie_demandee)
-                                ->where('statut', 'disponible')
-                                ->first();
+                ->where('statut', 'disponible')
+                ->first();
         }
 
         if ($materiel) {

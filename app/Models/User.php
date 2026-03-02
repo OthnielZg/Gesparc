@@ -11,6 +11,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $primaryKey = 'id';
+
     public $incrementing = true;
 
     protected $fillable = [
@@ -41,13 +42,19 @@ class User extends Authenticatable
     }
 
     // Role constants
-    const ROLE_ADMIN       = 'admin';
-    const ROLE_AGENT       = 'agent';
-    const ROLE_CHEF_CDI    = 'chef_cdi';
-    const ROLE_DR          = 'DR';
+    const ROLE_ADMIN = 'admin';
+
+    const ROLE_AGENT = 'agent';
+
+    const ROLE_CHEF_CDI = 'chef_cdi';
+
+    const ROLE_DR = 'DR';
+
     const ROLE_GESTIONNAIRE = 'gestionnaire';
-    const ROLE_SDREVT      = 'SDREVT';
-    const ROLE_DSI         = 'DSI';
+
+    const ROLE_SDREVT = 'SDREVT';
+
+    const ROLE_DSI = 'DSI';
 
     public static function allRoles(): array
     {
@@ -65,13 +72,13 @@ class User extends Authenticatable
     public static function roleLabels(): array
     {
         return [
-            self::ROLE_ADMIN        => 'Administrateur',
-            self::ROLE_AGENT        => 'Agent',
-            self::ROLE_CHEF_CDI     => 'Chef CDI',
-            self::ROLE_DR           => 'Directeur Régional (DR)',
+            self::ROLE_ADMIN => 'Administrateur',
+            self::ROLE_AGENT => 'Agent',
+            self::ROLE_CHEF_CDI => 'Chef CDI',
+            self::ROLE_DR => 'Directeur Régional (DR)',
             self::ROLE_GESTIONNAIRE => 'Chef SEDMI (Gestionnaire)',
-            self::ROLE_SDREVT       => 'SDREVT',
-            self::ROLE_DSI          => 'DSI',
+            self::ROLE_SDREVT => 'SDREVT',
+            self::ROLE_DSI => 'DSI',
         ];
     }
 
@@ -85,26 +92,59 @@ class User extends Authenticatable
         if (is_array($roles)) {
             return in_array($this->role, $roles);
         }
+
         return $this->role === $roles;
     }
 
-    public function isAdmin(): bool    { return $this->role === self::ROLE_ADMIN; }
-    public function isAgent(): bool    { return $this->role === self::ROLE_AGENT; }
-    public function isChefCdi(): bool  { return $this->role === self::ROLE_CHEF_CDI; }
-    public function isDR(): bool       { return $this->role === self::ROLE_DR; }
-    public function isGestionnaire(): bool { return $this->role === self::ROLE_GESTIONNAIRE; }
-    public function isSDREVT(): bool   { return $this->role === self::ROLE_SDREVT; }
-    public function isDSI(): bool      { return $this->role === self::ROLE_DSI; }
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isAgent(): bool
+    {
+        return $this->role === self::ROLE_AGENT;
+    }
+
+    public function isChefCdi(): bool
+    {
+        return $this->role === self::ROLE_CHEF_CDI;
+    }
+
+    public function isDR(): bool
+    {
+        return $this->role === self::ROLE_DR;
+    }
+
+    public function isGestionnaire(): bool
+    {
+        return $this->role === self::ROLE_GESTIONNAIRE;
+    }
+
+    public function isSDREVT(): bool
+    {
+        return $this->role === self::ROLE_SDREVT;
+    }
+
+    public function isDSI(): bool
+    {
+        return $this->role === self::ROLE_DSI;
+    }
 
     public function getFullNameAttribute(): string
     {
-        return $this->prenom . ' ' . $this->nom;
+        return $this->prenom.' '.$this->nom;
     }
 
     // Relationships
     public function bureau()
     {
         return $this->belongsTo(Bureau::class, 'id_bureau');
+    }
+
+    public function direction()
+    {
+        return $this->belongsTo(Direction::class, 'id_direction');
     }
 
     public function demandes()
