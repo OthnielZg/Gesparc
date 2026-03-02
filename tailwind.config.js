@@ -12,8 +12,10 @@ export default {
     theme: {
         extend: {
             colors: {
-                'ci-orange': '#FF6600',
-                'ci-green': '#009E60',
+                'ci-orange': '#EE6B12',
+                'ci-green': '#076835',
+                'ci-green-dark': '#044C26',
+                'ci-bg': '#F4F7F6',
             },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],

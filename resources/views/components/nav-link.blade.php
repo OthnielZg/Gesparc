@@ -2,11 +2,11 @@
 
 @php
 $classes = ($active ?? false)
-            ? 'flex items-center px-4 py-3 text-sm font-bold text-white bg-slate-800 rounded-xl sidebar-link-active transition-all group'
-            : 'flex items-center px-4 py-3 text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group';
+            ? 'flex items-center px-4 py-3 text-sm font-bold text-white bg-white/10 rounded-2xl transition-all group border-l-4 border-ci-orange shadow-inner'
+            : 'flex items-center px-4 py-3 text-sm font-bold text-white/60 hover:text-white hover:bg-white/5 rounded-2xl transition-all group border-l-4 border-transparent';
 @endphp
 
 <a {{ $attributes->merge(['class' => $classes]) }}>
-    <i class="fa-solid {{ $icon }} mr-3 text-sm {{ ($active ?? false) ? 'text-ci-orange' : 'text-slate-500' }} group-hover:text-ci-orange transition-colors"></i>
+    <i class="fa-solid {{ $icon }} w-8 text-center text-lg {{ ($active ?? false) ? 'text-ci-orange' : 'text-white/40' }} group-hover:scale-110 group-hover:text-white transition-all"></i>
     {{ $slot }}
 </a>

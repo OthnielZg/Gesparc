@@ -22,6 +22,7 @@ class User extends Authenticatable
         'actif',
         'role',
         'id_bureau',
+        'photo_path',
         'photo_url',
     ];
 
