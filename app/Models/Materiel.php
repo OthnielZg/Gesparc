@@ -50,9 +50,6 @@ class Materiel extends Model
             'Scanner',
             'Serveur',
             'Switch / Réseau',
-            'Téléphone IP',
-            'Tablette',
-            'Autre',
         ];
     }
 

@@ -30,11 +30,19 @@ class DemandeController extends Controller
 
     public function create()
     {
+        if (Auth::user()->hasRole(['admin', 'gestionnaire'])) {
+            abort(403, 'Les administrateurs et gestionnaires ne peuvent pas créer de demandes.');
+        }
+
         return view('demandes.create');
     }
 
     public function store(Request $request)
     {
+        if (Auth::user()->hasRole(['admin', 'gestionnaire'])) {
+            abort(403, 'Les administrateurs et gestionnaires ne peuvent pas créer de demandes.');
+        }
+
         $validated = $request->validate([
             'categorie_demandee' => 'required|string',
             'quantite' => 'required|integer|min:1',
