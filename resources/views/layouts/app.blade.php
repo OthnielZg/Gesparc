@@ -26,6 +26,28 @@
         <style>
             [x-cloak] { display: none !important; }
             .sidebar-link-active { background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #EE6B12; }
+            /* High-end Custom Scrollbar for Sidebar */
+            .sidebar-scroll {
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE/Edge */
+            }
+            .sidebar-scroll::-webkit-scrollbar {
+                width: 3px;
+                display: none; /* Chrome/Safari */
+            }
+            .sidebar-scroll:hover::-webkit-scrollbar {
+                display: block;
+            }
+            .sidebar-scroll::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .sidebar-scroll::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 20px;
+            }
+            .sidebar-scroll:hover::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+            }
         </style>
     </head>
     <body class="font-sans antialiased h-full overflow-hidden text-gray-800" x-data="{ sidebarOpen: false, desktopSidebarOpen: true, scrolled: false, showLogoutModal: false }">
@@ -46,7 +68,7 @@
                        x-transition:leave-start="ml-0"
                        x-transition:leave-end="-ml-[260px]"
                 >
-                    <div class="flex flex-col w-[260px] bg-ci-green-dark shadow-xl overflow-y-auto w-full">
+                    <div class="flex flex-col w-[260px] bg-ci-green-dark shadow-xl overflow-y-auto sidebar-scroll w-full">
                         @include('layouts.sidebar')
                     </div>
                 </aside>
@@ -63,7 +85,7 @@
                      @click.away="sidebarOpen = false"
                      x-cloak>
                     <div class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
-                    <div class="relative flex-1 flex flex-col max-w-xs w-[260px] bg-ci-green-dark h-full">
+                    <div class="relative flex-1 flex flex-col max-w-xs w-[260px] bg-ci-green-dark h-full sidebar-scroll overflow-y-auto">
                         <div class="absolute top-0 right-0 -mr-12 pt-2">
                             <button type="button" 
                                     @click="sidebarOpen = false"
@@ -142,5 +164,6 @@
                 </div>
             </div>
         </div>
+        @stack('scripts')
     </body>
 </html>

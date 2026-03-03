@@ -56,6 +56,11 @@ class User extends Authenticatable
 
     const ROLE_DSI = 'DSI';
 
+    public static function roles(): array
+    {
+        return self::roleLabels();
+    }
+
     public static function allRoles(): array
     {
         return [

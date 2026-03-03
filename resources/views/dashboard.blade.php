@@ -124,6 +124,7 @@
         <div class="flex flex-col space-y-6">
             <h3 class="text-xl font-black text-gray-900 tracking-tight pl-2">Actions Rapides</h3>
             
+            @unless(Auth::user()->hasRole(['admin', 'gestionnaire']))
             <a href="{{ route('demandes.create') }}" class="relative overflow-hidden bg-ci-green-dark p-6 rounded-[2rem] shadow-xl shadow-green-900/20 hover:scale-[1.02] transition-transform group block">
                 <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                 <div class="relative z-10 flex items-center justify-between">
@@ -136,6 +137,7 @@
                     </div>
                 </div>
             </a>
+            @endunless
 
             @if(Auth::user()->hasRole(['admin']))
             <a href="{{ route('admin.users.create') }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-ci-orange hover:shadow-md transition-all group flex items-center justify-between">

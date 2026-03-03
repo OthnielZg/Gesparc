@@ -13,10 +13,10 @@
                 <i class="fa-solid fa-bars text-xl"></i>
             </button>
 
-                <!-- Full Brand Logo Only -->
-                <div class="flex items-center w-auto">
-                    <img src="{{ asset('images/logo_dgi.png') }}" alt="Logo DGI" class="w-64 sm:w-80 max-h-12 object-contain">
-                </div>
+                <!-- Full Brand Logo with Link -->
+                <a href="{{ route('dashboard') }}" class="flex items-center group -ml-6">
+                    <img src="{{ asset('images/logo_dgi.png') }}" alt="Logo DGI" class="w-72 sm:w-96 max-h-14 object-contain transition-transform group-hover:scale-[1.02]">
+                </a>
         </div>
 
         <!-- Right Actions & Profile -->

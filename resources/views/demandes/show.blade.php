@@ -151,13 +151,13 @@
                     </form>
                 @endif
 
-                <!-- Actions Validateurs -->
                 @php
                     $statusMap = ['DR' => 'en_attente_dr', 'gestionnaire' => 'transmise_gestionnaire', 'SDREVT' => 'proposition_sdrevt', 'DSI' => 'en_attente_dsi'];
                     $canValidate = ($statusMap[$user->role] ?? null) === $demande->statut;
                 @endphp
 
-                @if($canValidate)
+                {{-- ═══ FORMULAIRE STANDARD (DR, Gestionnaire) ═══ --}}
+                @if($canValidate && !$user->isSDREVT() && !$user->isDSI())
                     <div class="space-y-4" x-data="{ open: false, decision: 'OK' }">
                         <button @click="open = true; decision = 'OK'" class="w-full py-5 bg-white text-ci-green-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl group">
                             <i class="fa-solid fa-check-double mr-2 text-ci-orange group-hover:scale-125 transition-transform"></i> Valider le dossier
@@ -166,59 +166,273 @@
                             Rejeter ce dossier
                         </button>
 
-                        <!-- Premium Validation Modal -->
-                        <div x-show="open" x-cloak 
-                             class="fixed inset-0 z-[110] flex items-center justify-center p-4"
+                        <!-- Modal standard -->
+                        <div x-show="open" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4"
                              x-transition:enter="transition ease-out duration-300"
                              x-transition:enter-start="opacity-0"
                              x-transition:enter-end="opacity-100">
-                             
                             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md"></div>
-
-                            <div class="relative bg-white w-full max-w-lg p-10 rounded-[3rem] shadow-2xl text-gray-900 transform transition-all"
+                            <div class="relative bg-white w-full max-w-lg p-10 rounded-[3rem] shadow-2xl text-gray-900"
                                  x-transition:enter="transition ease-out duration-300"
                                  x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                                  x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                                  @click.away="open = false">
-                                
                                 <div class="flex items-center gap-4 mb-8">
                                     <div class="h-16 w-16 rounded-3xl flex items-center justify-center" :class="decision == 'OK' ? 'bg-green-50 text-ci-green' : 'bg-red-50 text-red-500'">
-                                        <i class="fa-solid" :class="decision == 'OK' ? 'fa-circle-check text-2xl' : 'fa-circle-xmark text-2xl'"></i>
+                                        <i class="fa-solid text-2xl" :class="decision == 'OK' ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
                                     </div>
                                     <div>
-                                        <h3 class="text-2xl font-black tracking-tighter" x-text="decision == 'OK' ? 'Validation DGI' : 'Rejet du dossier'"></h3>
+                                        <h3 class="text-2xl font-black tracking-tighter" x-text="decision == 'OK' ? 'Valider le dossier' : 'Rejeter le dossier'"></h3>
                                         <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Enregistrement de décision</p>
                                     </div>
                                 </div>
-
                                 <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-6">
                                     @csrf
                                     <input type="hidden" name="decision" :value="decision">
-                                    
-                                    @if($user->role == 'gestionnaire')
+                                    @if($user->isGestionnaire())
                                         <div class="space-y-2">
-                                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Choix du Matériel en Stock (SEDMI)</label>
+                                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Matériel proposé (Stock SEDMI)</label>
                                             <select name="id_materiel" required class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-ci-green rounded-2xl text-sm font-bold outline-none transition-all">
-                                                <option value="">Séléctionner une unité...</option>
-                                                @foreach(\App\Models\Materiel::where('categorie', $demande->categorie_demandee)->where('statut', 'disponible')->get() as $m)
-                                                    <option value="{{ $m->id }}">S/N: {{ $m->numero_serie }} — {{ $m->marque }} {{ $m->modele }}</option>
+                                                <option value="">Sélectionner une unité...</option>
+                                                @foreach($materielsDisponibles as $m)
+                                                    <option value="{{ $m->id }}">{{ $m->marque }} {{ $m->modele }} — S/N: {{ $m->numero_serie }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="space-y-2">
+                                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Note technique (Optionnel)</label>
+                                            <textarea name="note_gestionnaire" placeholder="Justification du choix..." class="w-full p-5 bg-gray-50 border-2 border-transparent focus:border-ci-green rounded-2xl text-sm font-bold outline-none h-24"></textarea>
+                                        </div>
                                     @endif
-
                                     <div class="space-y-2">
-                                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1 text-left">Motif / Commentaire (Optionnel)</label>
-                                        <textarea name="commentaire" placeholder="Ajoutez un message pour le prochain valideur..." 
-                                                  class="w-full p-5 bg-gray-50 border-2 border-transparent focus:border-ci-green rounded-2xl text-sm font-bold outline-none transition-all h-32"></textarea>
+                                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Commentaire (Optionnel)</label>
+                                        <textarea name="commentaire" placeholder="Ajoutez un commentaire..." class="w-full p-5 bg-gray-50 border-2 border-transparent focus:border-ci-green rounded-2xl text-sm font-bold outline-none h-28"></textarea>
                                     </div>
-                                    
                                     <div class="flex gap-4 pt-4">
                                         <button type="button" @click="open = false" class="flex-1 py-4 text-gray-400 font-black uppercase tracking-widest text-[10px]">Abandonner</button>
-                                        <button type="submit" class="flex-1 py-4 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all hover:scale-105 active:scale-95" 
+                                        <button type="submit" class="flex-1 py-4 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all hover:scale-105 active:scale-95"
                                                 :class="decision == 'OK' ? 'bg-ci-green shadow-green-900/10' : 'bg-red-600 shadow-red-900/10'">
                                             Signer ma décision
                                         </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- ═══ FORMULAIRE SDREVT — Valider ou Contre-proposer ═══ --}}
+                @if($canValidate && $user->isSDREVT())
+                    <div x-data="{ choix: 'valide_sedmi', rejet: false }">
+
+                        {{-- Rappel proposition SEDMI --}}
+                        @if($demande->materiel_propose)
+                            <div class="mb-5 p-4 bg-white/10 rounded-2xl">
+                                <p class="text-[9px] font-black text-ci-orange uppercase tracking-widest mb-1">Proposition du Gestionnaire (SEDMI)</p>
+                                <p class="text-sm font-black text-white">{{ $demande->materiel_propose }}</p>
+                                @if($demande->commentaire_gestionnaire)
+                                    <p class="text-[10px] text-white/60 mt-1 italic">{{ $demande->commentaire_gestionnaire }}</p>
+                                @endif
+                            </div>
+                        @endif
+
+                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-5">
+                            @csrf
+                            <input type="hidden" name="decision" value="OK">
+                            <input type="hidden" name="decision_sdrevt" :value="choix">
+
+                            {{-- Choix SDREVT --}}
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block">Votre décision</label>
+                                <label class="flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all"
+                                       :class="choix === 'valide_sedmi' ? 'bg-white/20 border-2 border-white/40' : 'bg-white/5 border-2 border-transparent'">
+                                    <input type="radio" x-model="choix" value="valide_sedmi" class="hidden">
+                                    <div class="h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all"
+                                         :class="choix === 'valide_sedmi' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
+                                        <div x-show="choix === 'valide_sedmi'" class="h-2 w-2 rounded-full bg-white"></div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-black text-white">✅ Valider la proposition SEDMI</p>
+                                        <p class="text-[9px] text-white/50 mt-0.5">Transmettre telle quelle au DSI</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all"
+                                       :class="choix === 'contre_propose' ? 'bg-orange-500/20 border-2 border-orange-400/40' : 'bg-white/5 border-2 border-transparent'">
+                                    <input type="radio" x-model="choix" value="contre_propose" class="hidden">
+                                    <div class="h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all"
+                                         :class="choix === 'contre_propose' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
+                                        <div x-show="choix === 'contre_propose'" class="h-2 w-2 rounded-full bg-white"></div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-black text-white">🔄 Soumettre une contre-proposition</p>
+                                        <p class="text-[9px] text-white/50 mt-0.5">Proposer un matériel alternatif au DSI</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            {{-- Champs contre-proposition --}}
+                            <div x-show="choix === 'contre_propose'" x-collapse class="space-y-4 pt-2">
+                                <div>
+                                    <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Matériel alternatif proposé *</label>
+                                    <input type="text" name="materiel_contre_propose"
+                                           placeholder="Ex: HP EliteBook 840 G9"
+                                           class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Référence / Modèle</label>
+                                    <input type="text" name="reference_contre_propose"
+                                           placeholder="Ex: HP-840G9-I7-16GB"
+                                           class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Justification *</label>
+                                    <textarea name="justification_sdrevt" rows="3"
+                                              placeholder="Pourquoi ce matériel alternatif est-il plus approprié ?"
+                                              class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all resize-none"></textarea>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Commentaire (Optionnel)</label>
+                                <textarea name="commentaire" rows="2" placeholder="Note visible dans l'historique..."
+                                          class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all resize-none"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-5 bg-white text-ci-green-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
+                                <i class="fa-solid fa-paper-plane mr-2"></i> Transmettre au DSI
+                            </button>
+
+                            <button type="button" @click="rejet = true"
+                                    class="w-full py-3 bg-transparent border-2 border-white/20 text-white/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-red-500/50 hover:text-red-400 transition-all">
+                                Rejeter ce dossier
+                            </button>
+                        </form>
+
+                        {{-- Modal rejet SDREVT --}}
+                        <div x-show="rejet" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md" @click="rejet = false"></div>
+                            <div class="relative bg-white w-full max-w-md p-10 rounded-[3rem] shadow-2xl text-gray-900">
+                                <h3 class="text-2xl font-black tracking-tighter mb-2">Rejeter le dossier</h3>
+                                <p class="text-xs text-gray-400 mb-6">Cette action est irréversible. Le demandeur sera notifié.</p>
+                                <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-4">
+                                    @csrf
+                                    <input type="hidden" name="decision" value="KO">
+                                    <textarea name="commentaire" rows="3" placeholder="Motif du rejet (obligatoire)..." required
+                                              class="w-full p-4 bg-gray-50 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-red-400 resize-none"></textarea>
+                                    <div class="flex gap-3">
+                                        <button type="button" @click="rejet = false" class="flex-1 py-3 text-gray-400 font-black text-xs uppercase tracking-widest">Annuler</button>
+                                        <button type="submit" class="flex-1 py-3 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-700 transition-all">Confirmer le rejet</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- ═══ FORMULAIRE DSI — Arbitrage final ═══ --}}
+                @if($canValidate && $user->isDSI())
+                    <div x-data="{ choixDsi: 'retient_sedmi', rejet: false }">
+
+                        {{-- Proposition A (SEDMI) --}}
+                        <div class="mb-3 p-4 bg-white/10 rounded-2xl">
+                            <p class="text-[9px] font-black text-ci-orange uppercase tracking-widest mb-1">Proposition A — Gestionnaire SEDMI</p>
+                            <p class="text-sm font-black text-white">{{ $demande->materiel_propose ?? '—' }}</p>
+                        </div>
+
+                        {{-- Proposition B (SDREVT) si elle existe --}}
+                        @if($demande->hasContreProposition())
+                            <div class="mb-5 p-4 bg-orange-500/20 border border-orange-400/30 rounded-2xl">
+                                <p class="text-[9px] font-black text-orange-300 uppercase tracking-widest mb-1">Proposition B — SDREVT (Contre-proposition)</p>
+                                <p class="text-sm font-black text-white">{{ $demande->materiel_contre_propose }}</p>
+                                @if($demande->justification_sdrevt)
+                                    <p class="text-[10px] text-white/60 mt-1 italic">{{ $demande->justification_sdrevt }}</p>
+                                @endif
+                            </div>
+                        @else
+                            <div class="mb-5 p-3 bg-white/5 rounded-2xl">
+                                <p class="text-[9px] text-white/40 uppercase tracking-widest">SDREVT a validé la proposition SEDMI sans contre-proposition.</p>
+                            </div>
+                        @endif
+
+                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-5">
+                            @csrf
+                            <input type="hidden" name="decision" value="OK">
+                            <input type="hidden" name="decision_dsi" :value="choixDsi">
+
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block">Votre arbitrage</label>
+
+                                <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all"
+                                       :class="choixDsi === 'retient_sedmi' ? 'bg-white/20 border-2 border-white/40' : 'bg-white/5 border-2 border-transparent'">
+                                    <input type="radio" x-model="choixDsi" value="retient_sedmi" class="hidden">
+                                    <div class="h-5 w-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
+                                         :class="choixDsi === 'retient_sedmi' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
+                                        <div x-show="choixDsi === 'retient_sedmi'" class="h-2 w-2 rounded-full bg-white"></div>
+                                    </div>
+                                    <p class="text-xs font-black text-white">Retenir A (Proposition SEDMI)</p>
+                                </label>
+
+                                @if($demande->hasContreProposition())
+                                    <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all"
+                                           :class="choixDsi === 'retient_sdrevt' ? 'bg-orange-500/20 border-2 border-orange-400/40' : 'bg-white/5 border-2 border-transparent'">
+                                        <input type="radio" x-model="choixDsi" value="retient_sdrevt" class="hidden">
+                                        <div class="h-5 w-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
+                                             :class="choixDsi === 'retient_sdrevt' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
+                                            <div x-show="choixDsi === 'retient_sdrevt'" class="h-2 w-2 rounded-full bg-white"></div>
+                                        </div>
+                                        <p class="text-xs font-black text-white">Retenir B (Contre-proposition SDREVT)</p>
+                                    </label>
+                                @endif
+
+                                <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all"
+                                       :class="choixDsi === 'autre' ? 'bg-purple-500/20 border-2 border-purple-400/40' : 'bg-white/5 border-2 border-transparent'">
+                                    <input type="radio" x-model="choixDsi" value="autre" class="hidden">
+                                    <div class="h-5 w-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
+                                         :class="choixDsi === 'autre' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
+                                        <div x-show="choixDsi === 'autre'" class="h-2 w-2 rounded-full bg-white"></div>
+                                    </div>
+                                    <p class="text-xs font-black text-white">Imposer une 3ᵉ option</p>
+                                </label>
+                            </div>
+
+                            <div x-show="choixDsi === 'autre'" x-collapse>
+                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Matériel imposé par le DSI *</label>
+                                <input type="text" name="materiel_retenu_dsi"
+                                       placeholder="Désignation précise du matériel..."
+                                       class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Note de décision DSI</label>
+                                <textarea name="commentaire_dsi" rows="2" placeholder="Commentaire visible par tous les acteurs..."
+                                          class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all resize-none"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-5 bg-white text-ci-green-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
+                                <i class="fa-solid fa-gavel mr-2"></i> Valider ma décision finale
+                            </button>
+
+                            <button type="button" @click="rejet = true"
+                                    class="w-full py-3 bg-transparent border-2 border-white/20 text-white/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-red-500/50 hover:text-red-400 transition-all">
+                                Annuler la demande
+                            </button>
+                        </form>
+
+                        {{-- Modal annulation DSI --}}
+                        <div x-show="rejet" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md" @click="rejet = false"></div>
+                            <div class="relative bg-white w-full max-w-md p-10 rounded-[3rem] shadow-2xl text-gray-900">
+                                <h3 class="text-2xl font-black tracking-tighter mb-2">Annuler la demande</h3>
+                                <p class="text-xs text-gray-400 mb-6">La demande sera définitivement annulée. L'agent sera notifié.</p>
+                                <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-4">
+                                    @csrf
+                                    <input type="hidden" name="decision" value="KO">
+                                    <textarea name="commentaire" rows="3" placeholder="Motif de l'annulation (obligatoire)..." required
+                                              class="w-full p-4 bg-gray-50 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-red-400 resize-none"></textarea>
+                                    <div class="flex gap-3">
+                                        <button type="button" @click="rejet = false" class="flex-1 py-3 text-gray-400 font-black text-xs uppercase tracking-widest">Annuler</button>
+                                        <button type="submit" class="flex-1 py-3 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-700 transition-all">Confirmer l'annulation</button>
                                     </div>
                                 </form>
                             </div>

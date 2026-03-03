@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\WorkflowValidationTest" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" tests="9" assertions="13" errors="0" failures="1" skipped="0" time="0.391493">
+    <testcase name="test_dr_peut_valider_et_transmettre_au_gestionnaire" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="38" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="4" time="0.251989"/>
+    <testcase name="test_dr_peut_rejeter_une_demande" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="54" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="1" time="0.014834"/>
+    <testcase name="test_sdrevt_peut_valider_proposition_sedmi" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="70" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="1" time="0.014866"/>
+    <testcase name="test_sdrevt_peut_soumettre_une_contre_proposition" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="90" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="1" time="0.017103"/>
+    <testcase name="test_sdrevt_contre_proposition_sans_justification_echoue" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="116" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="2" time="0.016382"/>
+    <testcase name="test_dsi_peut_retenir_proposition_sedmi" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="136" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="1" time="0.015295"/>
+    <testcase name="test_dsi_peut_retenir_contre_proposition_sdrevt" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="160" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="1" time="0.019084"/>
+    <testcase name="test_dsi_peut_imposer_une_troisieme_option" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="186" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="1" time="0.016031"/>
+    <testcase name="test_dsi_peut_annuler_une_demande" file="C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php" line="211" class="Tests\Feature\WorkflowValidationTest" classname="Tests.Feature.WorkflowValidationTest" assertions="1" time="0.025909">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\WorkflowValidationTest::test_dsi_peut_annuler_une_demande&#13;
+Failed asserting that a row in the table [demandes] matches the attributes {
+    "id": 1,
+    "statut": "rejetee"
+}.
+
+Found similar results: [
+    {
+        "id": 1,
+        "statut": "annulee"
+    }
+].
+&#13;
+C:\Users\othni\Documents\project\Gesparc\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:43
+C:\Users\othni\Documents\project\Gesparc\tests\Feature\WorkflowValidationTest.php:222</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

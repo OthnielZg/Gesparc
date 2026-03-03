@@ -137,6 +137,9 @@
                             </td>
                             <td class="px-8 py-6 text-right">
                                 <div class="flex justify-end gap-3 opacity-20 group-hover:opacity-100 transition-opacity">
+                                    <a href="{{ route('materiels.show', $materiel) }}" class="p-2 text-gray-400 hover:text-ci-green transition-all hover:scale-125" title="Voir le Code QR / Étiquette" onclick="event.stopPropagation()">
+                                        <i class="fa-solid fa-qrcode"></i>
+                                    </a>
                                     <a href="{{ route('materiels.edit', $materiel) }}" class="p-2 text-gray-400 hover:text-ci-orange transition-all hover:scale-125" onclick="event.stopPropagation()">
                                         <i class="fa-solid fa-pen-nib"></i>
                                     </a>

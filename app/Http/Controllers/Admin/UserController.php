@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Bureau;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -13,13 +13,15 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('bureau.servic.direction')->latest()->paginate(10);
+        $users = User::with('bureau.service.direction')->latest()->paginate(10);
+
         return view('admin.users.index', compact('users'));
     }
 
     public function create()
     {
-        $bureaux = Bureau::with('servic.direction.ville')->get();
+        $bureaux = Bureau::with('service.direction.ville')->get();
+
         return view('admin.users.create', compact('bureaux'));
     }
 
@@ -51,7 +53,8 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $bureaux = Bureau::with('servic.direction.ville')->get();
+        $bureaux = Bureau::with('service.direction.ville')->get();
+
         return view('admin.users.edit', compact('user', 'bureaux'));
     }
 
@@ -78,8 +81,13 @@ class UserController extends Controller
 
     public function toggleStatus(User $user)
     {
-        $user->update(['actif' => !$user->actif]);
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Vous ne pouvez pas bloquer votre propre compte.');
+        }
+
+        $user->update(['actif' => ! $user->actif]);
         $status = $user->actif ? 'activé' : 'désactivé';
+
         return back()->with('success', "Compte utilisateur $status.");
     }
 
@@ -89,6 +97,7 @@ class UserController extends Controller
             return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');
         }
         $user->delete();
+
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé.');
     }
 }

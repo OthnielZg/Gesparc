@@ -29,6 +29,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('mon-materiel', [MonMaterielController::class, 'index'])->name('mon-materiel.index');
 
     Route::get('affectations', [AffectationController::class, 'index'])->name('affectations.index');
+    Route::get('affectations/dotations', [AffectationController::class, 'dotations'])->name('affectations.dotations');
+    Route::get('affectations/{demande}/finaliser', [AffectationController::class, 'finaliser'])->name('affectations.finaliser');
+    Route::post('affectations/{demande}/finaliser', [AffectationController::class, 'storeFinalisation'])->name('affectations.storeFinalisation');
     Route::get('affectations/{affectation}/download', [AffectationController::class, 'download'])->name('affectations.download');
 
     // Admin Routes

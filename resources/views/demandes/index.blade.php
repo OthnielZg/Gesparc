@@ -8,12 +8,20 @@
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Gestion du patrimoine informatique
                     • DGI</p>
             </div>
+<<<<<<< HEAD
             @if(!Auth::user()->hasRole(['admin', 'gestionnaire']))
                 <a href="{{ route('demandes.create') }}"
                     class="inline-flex items-center px-8 py-4 bg-ci-green text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-green-900/10 hover:scale-105 transition-all active:scale-95">
                     <i class="fa-solid fa-plus mr-3"></i> Nouvelle Demande
                 </a>
             @endif
+=======
+            @unless(Auth::user()->hasRole(['admin', 'gestionnaire']))
+            <a href="{{ route('demandes.create') }}" class="inline-flex items-center px-8 py-4 bg-ci-green text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-green-900/10 hover:scale-105 transition-all active:scale-95">
+                <i class="fa-solid fa-plus mr-3"></i> Nouvelle Demande
+            </a>
+            @endunless
+>>>>>>> d518b1d (Amelioration front admin et fonctionnalité et debut d'amélioration Gestionnaire)
         </div>
     </x-slot>
 

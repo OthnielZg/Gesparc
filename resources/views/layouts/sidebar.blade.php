@@ -1,4 +1,4 @@
-<div class="flex flex-col h-full overflow-y-auto text-white">
+<div class="flex flex-col h-full text-white">
     <!-- Sidebar spacing since logo is in topbar -->
     <div class="h-6"></div>
 
@@ -11,6 +11,7 @@
         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="fa-chart-pie">
             Tableau de bord
         </x-nav-link>
+<<<<<<< HEAD
 
         @if(!Auth::user()->hasRole(['admin', 'gestionnaire']))
             <x-nav-link :href="route('demandes.index')" :active="request()->routeIs('demandes.index')"
@@ -18,6 +19,12 @@
                 {{ Auth::user()->hasRole('agent') ? 'Mes Demandes' : 'Suivi des Dossiers' }}
             </x-nav-link>
         @endif
+=======
+        <x-nav-link :href="route('demandes.index')" :active="request()->routeIs('demandes.index')" icon="fa-file-invoice">
+            {{ Auth::user()->hasRole('agent') ? 'Mes Demandes' : 'Suivi des Dossiers' }}
+        </x-nav-link>
+
+>>>>>>> d518b1d (Amelioration front admin et fonctionnalité et debut d'amélioration Gestionnaire)
         @if(Auth::user()->hasRole(['agent', 'chef_cdi', 'DR']))
             <x-nav-link :href="route('mon-materiel.index')" :active="request()->routeIs('mon-materiel.*')" icon="fa-laptop">
                 @php
@@ -59,6 +66,12 @@
                     @endphp
                     {{ $label }}
                 </x-nav-link>
+
+                @if(Auth::user()->hasRole('gestionnaire'))
+                    <x-nav-link :href="route('affectations.dotations')" :active="request()->routeIs('affectations.dotations') || request()->routeIs('affectations.finaliser')" icon="fa-truck-ramp-box">
+                        Dotations à Finaliser
+                    </x-nav-link>
+                @endif
             @endif
         @endif
 
