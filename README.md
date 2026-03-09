@@ -1,41 +1,42 @@
-# GESPARC - Gestion du Parc Informatique DGI
+# 🏦 GESPARC (DGI) - Portail de Documentation Ultime
 
-**GESPARC** est une application web moderne développée pour la **Direction Générale des Impôts (DGI)** de la République de Côte d'Ivoire. Elle permet de gérer l'inventaire du matériel informatique et d'automatiser le processus de demande et d'affectation via un workflow structuré (Cycle MCT).
+Bienvenue sur le dépôt de **GESPARC**, l'application de gestion de parc informatique de la DGI.
 
-## 🚀 Fonctionnalités Clés
-
-- **MCT Workflow (7 étapes)** : Un processus rigoureux allant de la création de la pré-demande par l'agent jusqu'à l'approbation finale par la DSI.
-- **Gestion d'Inventaire** : Suivi précis du matériel (ordinateurs, imprimantes, etc.) avec gestion des statuts et des fournisseurs.
-- **Interface DGI Premium** : Design soigné respectant la charte graphique de la DGI (Orange & Vert).
-- **Redirection par Rôles** : Accès sécurisé et tableaux de bord personnalisés pour 7 types d'utilisateurs.
-- **Rapports PDF** : Génération automatique des bordereaux d'affectation.
-
-## 🛠️ Installation & Démarrage
-
-### Pré-requis
-- PHP 8.2+
-- Composer
-- Node.js & NPM
-- SQLite (ou MySQL)
-
-### Installation
-1. Clonez le dépôt : `git clone <votre-url-github>`
-2. Installez les dépendances PHP : `composer install`
-3. Installez les dépendances JS : `npm install`
-4. Copiez le fichier d'environnement : `cp .env.example .env`
-5. Générez la clé de l'application : `php artisan key:generate`
-6. Préparez la base de données : `touch database/database.sqlite`
-7. Exécutez les migrations et les seeders : `php artisan migrate:fresh --seed`
-
-### Lancement
-- **Serveur PHP** : `php artisan serve`
-- **Compilation Assets** : `npm run dev`
-
-## 👥 Rôles Utilisateurs (Test)
-Tous les comptes utilisent le mot de passe : `password`
-- **Admin** : `admin@dgi.ci`
-- **Agent** : `agent@dgi.ci`
-- **DSI** : `dsi@dgi.ci`
+Ce projet a été documenté avec un soin extrême pour permettre à n'importe quel développeur, même débutant, de comprendre **chaque ligne de code**.
 
 ---
-*GESPARC v1.0 - Un projet moderne pour une administration efficace.*
+
+## 📚 Les 3 piliers de la documentation
+
+### 🧠 [Guide Backend Hyper-Deep Dive](README_BACKEND.md)
+Le "Cerveau" de l'application. Découvrez comment Laravel gère vos demandes, les contrôleurs de workflow et la sécurité par rôles, expliqués pas à pas.
+
+### 🎨 [Guide Frontend Hyper-Deep Dive](README_FRONTEND.md)
+Le "Visage" de l'application. Découvrez le design system Premium (Tailwind CSS v3), les composants Blade réutilisables et l'interactivité avec Alpine.js.
+
+### 🗄️ [Guide Database & Schémas](README_DATABASE.md)
+La "Mémoire" de l'application. Apprenez comment sont structurées vos tables et comment les migrations créent vos étagères de données automatiquement.
+
+---
+
+## 📋 Installation en 1 Minute (Droit au but)
+
+```bash
+# 1. Installer les moteurs (PHP & Design)
+composer install
+npm install
+
+# 2. Configurer l'environnement
+cp .env.example .env
+php artisan key:generate
+
+# 3. Préparer la base de données (Commande magique)
+php artisan migrate:fresh --seed
+
+# 4. Lancer le site
+php artisan serve   # Puis ouvrir http://127.0.0.1:8000
+npm run dev         # Laisser tourner pour le design
+```
+
+---
+*Fait avec ❤️ pour la Direction Générale des Impôts.*
