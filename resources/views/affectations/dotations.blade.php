@@ -14,22 +14,26 @@
     </x-slot>
 
     <div class="space-y-8">
-        <!-- Bannière d'information -->
-        <div class="bg-black rounded-[2.5rem] p-8 text-white flex items-center justify-between overflow-hidden relative">
-            <div class="relative z-10">
-                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-ci-orange mb-2 block">Procédure de Fin de Circuit</span>
-                <h3 class="text-2xl font-black tracking-tighter leading-tight">
-                    Validation de la remise <br>physique du matériel
-                </h3>
-                <p class="text-gray-400 text-xs font-bold mt-4 max-w-md leading-relaxed">
-                    Cette étape confirme que l'agent a bien reçu son équipement. 
-                    Elle génère automatiquement le bordereau d'affectation et met à jour le stock.
-                </p>
+        <!-- Alertes de session -->
+        @if(session('success'))
+            <div class="p-6 rounded-3xl bg-green-50 border border-green-100 flex items-center gap-4 text-green-700 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm text-green-500">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <p class="text-[10px] font-black uppercase tracking-widest">{{ session('success') }}</p>
             </div>
-            <div class="hidden md:block">
-                <i class="fa-solid fa-truck-fast text-8xl text-white/5 -rotate-12"></i>
+        @endif
+
+        @if(session('error'))
+            <div class="p-6 rounded-3xl bg-red-50 border border-red-100 flex items-center gap-4 text-red-700 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm text-red-500">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <p class="text-[10px] font-black uppercase tracking-widest">{{ session('error') }}</p>
             </div>
-        </div>
+        @endif
+
+
 
         <!-- Liste des dotations -->
         <div class="bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-gray-100 overflow-hidden">
@@ -124,4 +128,5 @@
             @endif
         </div>
     </div>
+
 </x-app-layout>

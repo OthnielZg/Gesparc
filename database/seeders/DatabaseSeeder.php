@@ -86,13 +86,13 @@ class DatabaseSeeder extends Seeder
             'actif' => true,
         ]);
 
-        // SDREVT
+        // SDGRTE
         User::create([
             'prenom' => 'Paul',
             'nom' => 'Aman',
-            'email' => 'sdrevt@dgi.ci',
+            'email' => 'sdgrte@dgi.ci',
             'password' => $password,
-            'role' => User::ROLE_SDREVT,
+            'role' => User::ROLE_SDGRTE,
             'actif' => true,
         ]);
 

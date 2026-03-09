@@ -45,21 +45,61 @@
                 <x-input-error class="mt-2" :messages="$errors->get('photo')" />
                 <p
                     class="mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-white/50 inline-block px-3 py-1 rounded-full border border-gray-100">
-                    Format: PNG, JPG ou GIF • Taille max: 2 Mo</p>
+                    Format: PNG, JPG ou GIF • Taille max: 20 Mo</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+        <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
             <button type="submit"
                 class="bg-ci-green inline-flex items-center px-6 py-3 border border-transparent rounded-xl font-black text-xs text-white uppercase tracking-widest hover:bg-ci-green-dark focus:bg-ci-green-dark active:bg-ci-green-dark focus:outline-none focus:ring-2 focus:ring-ci-orange focus:ring-offset-2 transition ease-in-out duration-150 shadow-md">
                 {{ __('Enregistrer la photo') }}
             </button>
+
+            @if(isset($user->photo_path) && $user->photo_path)
+                <button type="button" 
+                    x-data=""
+                    x-on:click.prevent="$dispatch('open-modal', 'confirm-photo-deletion')"
+                    class="bg-white border border-red-200 text-red-500 inline-flex items-center px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-red-50 hover:border-red-300 transition-all duration-150">
+                    <i class="fa-solid fa-trash-can mr-2"></i> {{ __('Supprimer') }}
+                </button>
+            @endif
 
             @if (session('status') === 'profile-updated')
                 <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm font-bold text-ci-green"><i class="fa-solid fa-check mr-2"></i>{{ __('Sauvegardée.') }}
                 </p>
             @endif
+
+            @if (session('status') === 'photo-deleted')
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                    class="text-sm font-bold text-red-500"><i class="fa-solid fa-trash-can mr-2"></i>{{ __('Supprimée.') }}
+                </p>
+            @endif
         </div>
     </form>
+
+    <x-modal name="confirm-photo-deletion" :show="false" focusable>
+        <form method="post" action="{{ route('profile.photo.destroy') }}" class="p-6">
+            @csrf
+            @method('delete')
+
+            <h2 class="text-xl font-black text-gray-900">
+                {{ __('Supprimer la photo de profil ?') }}
+            </h2>
+
+            <p class="mt-3 text-sm text-gray-600 font-bold">
+                {{ __('Votre avatar sera réinitialisé à vos initiales.') }}
+            </p>
+
+            <div class="mt-8 flex justify-end gap-3">
+                <button type="button" x-on:click="$dispatch('close')" class="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all">
+                    {{ __('Annuler') }}
+                </button>
+
+                <button type="submit" class="px-6 py-3 bg-red-500 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-red-600 transition-all shadow-lg shadow-red-500/20">
+                    {{ __('Confirmer') }}
+                </button>
+            </div>
+        </form>
+    </x-modal>
 </section>

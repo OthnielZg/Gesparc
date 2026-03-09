@@ -56,7 +56,7 @@ class AffectationController extends Controller
         ]);
 
         return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $demande) {
-            $materielId = $this->getMaterielIdFromReference($demande->materiel_retenu_dsi);
+            $materielId = $this->getMaterielIdFromReference($demande->getMaterielRetenuLabel());
 
             if (! $materielId) {
                 return redirect()->back()
@@ -85,7 +85,7 @@ class AffectationController extends Controller
             \App\Models\Materiel::where('id', $materielId)->update(['statut' => 'affecte']);
 
             return redirect()->route('affectations.dotations')
-                ->with('success', 'Affectation finalisée avec succès. Vous pouvez maintenant imprimer le bordereau.');
+                ->with('success', 'Dossier clôturé avec succès et affectation enregistrée.');
         });
     }
 

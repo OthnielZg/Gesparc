@@ -26,27 +26,30 @@
         <style>
             [x-cloak] { display: none !important; }
             .sidebar-link-active { background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #EE6B12; }
-            /* High-end Custom Scrollbar for Sidebar */
+            /* Scrollbar de la Sidebar */
             .sidebar-scroll {
-                scrollbar-width: none; /* Firefox */
-                -ms-overflow-style: none; /* IE/Edge */
+                scrollbar-width: thin;
+                scrollbar-color: transparent transparent;
+            }
+            .sidebar-scroll:hover {
+                scrollbar-color: rgba(255,255,255,0.12) transparent;
             }
             .sidebar-scroll::-webkit-scrollbar {
-                width: 3px;
-                display: none; /* Chrome/Safari */
-            }
-            .sidebar-scroll:hover::-webkit-scrollbar {
-                display: block;
+                width: 5px;
             }
             .sidebar-scroll::-webkit-scrollbar-track {
                 background: transparent;
             }
             .sidebar-scroll::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 20px;
+                background: transparent;
+                border-radius: 10px;
+                transition: background 0.3s;
             }
             .sidebar-scroll:hover::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.2);
+                background: rgba(255, 255, 255, 0.12);
+            }
+            .sidebar-scroll:hover::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.25);
             }
         </style>
     </head>
@@ -81,19 +84,21 @@
                      x-transition:leave="transition-opacity ease-linear duration-300" 
                      x-transition:leave-start="opacity-100" 
                      x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 z-40 md:hidden" 
+                     class="fixed inset-0 z-40 md:hidden flex" 
                      @click.away="sidebarOpen = false"
                      x-cloak>
                     <div class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
-                    <div class="relative flex-1 flex flex-col max-w-xs w-[260px] bg-ci-green-dark h-full sidebar-scroll overflow-y-auto">
-                        <div class="absolute top-0 right-0 -mr-12 pt-2">
-                            <button type="button" 
-                                    @click="sidebarOpen = false"
-                                    class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                                <i class="fa-solid fa-xmark text-white"></i>
-                            </button>
-                        </div>
+                    <!-- Sidebar Panel -->
+                    <div class="relative flex flex-col w-[260px] bg-ci-green-dark h-full sidebar-scroll overflow-y-auto z-10">
                         @include('layouts.sidebar')
+                    </div>
+                    <!-- Close Button (outside overflow container) -->
+                    <div class="relative pt-2 pl-2 z-10">
+                        <button type="button" 
+                                @click="sidebarOpen = false"
+                                class="flex items-center justify-center h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 focus:outline-none transition-colors">
+                            <i class="fa-solid fa-xmark text-white text-lg"></i>
+                        </button>
                     </div>
                 </div>
 

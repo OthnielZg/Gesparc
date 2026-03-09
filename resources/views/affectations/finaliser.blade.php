@@ -18,6 +18,43 @@
     </x-slot>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+        <!-- Alertes de session -->
+        <div class="lg:col-span-3">
+            @if(session('success'))
+                <div class="mb-6 p-6 rounded-3xl bg-green-50 border border-green-100 flex items-center gap-4 text-green-700 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-circle-check text-green-500"></i>
+                    </div>
+                    <p class="text-xs font-black uppercase tracking-widest">{{ session('success') }}</p>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="mb-6 p-6 rounded-3xl bg-red-50 border border-red-100 flex items-center gap-4 text-red-700 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+                    </div>
+                    <p class="text-xs font-black uppercase tracking-widest">{{ session('error') }}</p>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-6 p-6 rounded-3xl bg-red-50 border border-red-100 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+                        </div>
+                        <p class="text-xs font-black text-red-700 uppercase tracking-widest">Des informations sont manquantes :</p>
+                    </div>
+                    <ul class="space-y-1 ml-14">
+                        @foreach($errors->all() as $error)
+                            <li class="text-[10px] font-bold text-red-600 uppercase tracking-tighter">• {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+        </div>
+
         <!-- Récapitulatif Gauche -->
         <div class="space-y-6">
             <!-- Carte Bénéficiaire -->
@@ -163,17 +200,15 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-gray-50">
-                    <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] flex items-center gap-2">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        Action sécurisée par session Agent
-                    </p>
-                    <div class="flex items-center gap-4 w-full md:w-auto">
-                        <a href="{{ route('affectations.dotations') }}" class="flex-1 md:flex-none text-center px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-[0.2em] hover:text-gray-900 transition-colors">Annuler</a>
-                        <button type="submit" class="flex-[2] md:flex-none px-12 py-5 bg-black text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-3xl shadow-2xl shadow-black/30 hover:bg-ci-orange hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3">
-                            Clôturer & Imprimer Bordereau
-                            <i class="fa-solid fa-print"></i>
+                <div class="flex flex-col items-center justify-center gap-6 pt-10 border-t border-gray-50">
+                    <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto justify-center">
+                        <button type="submit" class="w-full md:w-auto px-16 py-6 bg-ci-orange text-white text-xs font-black uppercase tracking-[0.3em] rounded-[2rem] shadow-2xl shadow-orange-900/20 hover:bg-black hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-4">
+                            Clôturer le Dossier
+                            <i class="fa-solid fa-check-double"></i>
                         </button>
+                        <a href="{{ route('affectations.dotations') }}" class="w-full md:w-auto px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-red-500 transition-colors text-center">
+                            Annuler l'opération
+                        </a>
                     </div>
                 </div>
             </form>

@@ -7,94 +7,181 @@
 
     <!-- Stat Cards Row -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        
-        <!-- Premium Card 1 -->
-        <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
-            <div class="flex items-start justify-between">
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <div class="bg-ci-orange text-white p-2 rounded-xl shadow-md shadow-ci-orange/30">
-                            <i class="fa-solid fa-laptop"></i>
+        @if(Auth::user()->role === 'agent')
+            <!-- Premium Card: Mes Matériels -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-ci-green text-white p-2 rounded-xl shadow-md shadow-ci-green/30">
+                                <i class="fa-solid fa-laptop"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Mes Matériels</span>
                         </div>
-                        <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Total Parc</span>
+                        <h3 class="text-4xl font-black text-gray-900">{{ $stats['mes_materiels'] }}</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">En ma possession</p>
                     </div>
-                    <h3 class="text-4xl font-black text-gray-900">{{ $stats['total_materiels'] }}</h3>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Unités enregistrées</p>
-                </div>
-                <!-- Mini sparkline placeholder -->
-                <div class="h-12 w-16 opacity-30 flex items-end justify-between space-x-1">
-                    <div class="w-full bg-ci-orange rounded-full h-1/3"></div>
-                    <div class="w-full bg-ci-orange rounded-full h-2/3"></div>
-                    <div class="w-full bg-ci-orange rounded-full h-3/4"></div>
-                    <div class="w-full bg-ci-orange rounded-full h-full"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- Premium Card 2 -->
-        <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
-            <div class="flex items-start justify-between">
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <div class="bg-ci-green-dark text-white p-2 rounded-xl shadow-md shadow-green-900/20">
-                            <i class="fa-solid fa-check-circle"></i>
+            <!-- Premium Card: Mes Demandes -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-ci-orange text-white p-2 rounded-xl shadow-md shadow-ci-orange/30">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Mes Demandes</span>
                         </div>
-                        <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Disponible</span>
+                        <h3 class="text-4xl font-black text-gray-900">{{ $stats['mes_demandes'] }}</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Historique personnel</p>
                     </div>
-                    <h3 class="text-4xl font-black text-gray-900">{{ $stats['disponible'] }}</h3>
-                    <p class="text-[10px] font-bold text-ci-green-dark uppercase tracking-widest mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Prêts à l'emploi</p>
                 </div>
             </div>
-        </div>
+        @elseif(Auth::user()->role === 'chef_cdi')
+            <!-- Premium Card: Matériel du Service -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-indigo-500 text-white p-2 rounded-xl shadow-md shadow-indigo-500/30">
+                                <i class="fa-solid fa-building-user"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Mon Service</span>
+                        </div>
+                        <h3 class="text-4xl font-black text-gray-900">{{ $stats['materiels_service'] }}</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Équipements du service</p>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Premium Card 3 -->
-        @if(isset($stats['demandes_a_valider']))
-        <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
-            <div class="flex items-start justify-between">
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <div class="bg-ci-green text-white p-2 rounded-xl shadow-md shadow-ci-green/30">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
+            <!-- Premium Card: Mes Matériels -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-ci-green text-white p-2 rounded-xl shadow-md shadow-ci-green/30">
+                                <i class="fa-solid fa-laptop"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Mes Matériels</span>
                         </div>
-                        <span class="text-sm font-black text-gray-500 tracking-wide uppercase">À Valider</span>
+                        <h3 class="text-4xl font-black text-gray-900">{{ $stats['mes_materiels'] }}</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">En ma possession</p>
                     </div>
-                    <h3 class="text-4xl font-black text-gray-900">{{ $stats['demandes_a_valider'] }}</h3>
-                    <p class="text-[10px] font-bold text-ci-orange uppercase tracking-widest mt-1">Actions requises</p>
                 </div>
             </div>
-        </div>
-        @elseif(isset($stats['total_users']))
-        <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
-             <div class="flex items-start justify-between">
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <div class="bg-slate-800 text-white p-2 rounded-xl shadow-md shadow-slate-900/20">
-                            <i class="fa-solid fa-users"></i>
+
+            <!-- Premium Card: Mes Demandes -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-ci-orange text-white p-2 rounded-xl shadow-md shadow-ci-orange/30">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Mes Demandes</span>
                         </div>
-                        <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Comptes</span>
+                        <h3 class="text-4xl font-black text-gray-900">{{ $stats['mes_demandes'] }}</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Historique personnel</p>
                     </div>
-                    <h3 class="text-4xl font-black text-gray-900">{{ $stats['total_users'] }}</h3>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Utilisateurs actifs</p>
                 </div>
             </div>
-        </div>
+        @else
+            <!-- Rôles Administratifs / Validation -->
+            
+            @if(Auth::user()->hasRole(['gestionnaire', 'DSI']))
+                <!-- Premium Card 1: Total Parc -->
+                <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-4">
+                                <div class="bg-ci-orange text-white p-2 rounded-xl shadow-md shadow-ci-orange/30">
+                                    <i class="fa-solid fa-laptop"></i>
+                                </div>
+                                <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Total Parc</span>
+                            </div>
+                            <h3 class="text-4xl font-black text-gray-900">{{ $stats['total_materiels'] }}</h3>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Unités enregistrées</p>
+                        </div>
+                        <!-- Mini sparkline placeholder -->
+                        <div class="h-12 w-16 opacity-30 flex items-end justify-between space-x-1">
+                            <div class="w-full bg-ci-orange rounded-full h-1/3"></div>
+                            <div class="w-full bg-ci-orange rounded-full h-2/3"></div>
+                            <div class="w-full bg-ci-orange rounded-full h-3/4"></div>
+                            <div class="w-full bg-ci-orange rounded-full h-full"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Premium Card 2: Disponible -->
+                <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-4">
+                                <div class="bg-ci-green-dark text-white p-2 rounded-xl shadow-md shadow-green-900/20">
+                                    <i class="fa-solid fa-check-circle"></i>
+                                </div>
+                                <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Disponible</span>
+                            </div>
+                            <h3 class="text-4xl font-black text-gray-900">{{ $stats['disponible'] }}</h3>
+                            <p class="text-[10px] font-bold text-ci-green-dark uppercase tracking-widest mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Prêts à l'emploi</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Premium Card: Mes Demandes (Visible par tous les admins/validators) -->
+            @if(!Auth::user()->isAdmin())
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-ci-orange text-white p-2 rounded-xl shadow-md shadow-ci-orange/30">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Mes Demandes</span>
+                        </div>
+                        <h3 class="text-4xl font-black text-gray-900">{{ $stats['mes_demandes'] }}</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Historique personnel</p>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Premium Card 3: À Valider -->
+            @if(isset($stats['demandes_a_valider']))
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-ci-green text-white p-2 rounded-xl shadow-md shadow-ci-green/30">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">À Valider</span>
+                        </div>
+                        <h3 class="text-4xl font-black text-gray-900">{{ $stats['demandes_a_valider'] }}</h3>
+                        <p class="text-[10px] font-bold text-ci-orange uppercase tracking-widest mt-1">Actions requises</p>
+                    </div>
+                </div>
+            </div>
+            @elseif(isset($stats['total_users']))
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                 <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-slate-800 text-white p-2 rounded-xl shadow-md shadow-slate-900/20">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Comptes</span>
+                        </div>
+                        <h3 class="text-4xl font-black text-gray-900">{{ $stats['total_users'] }}</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Utilisateurs actifs</p>
+                    </div>
+                </div>
+            </div>
+            @endif
         @endif
-
-        <!-- Premium Card 4 -->
-        <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
-            <div class="flex items-start justify-between">
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <div class="bg-blue-500 text-white p-2 rounded-xl shadow-md shadow-blue-500/30">
-                            <i class="fa-solid fa-file-invoice"></i>
-                        </div>
-                        <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Mes Activités</span>
-                    </div>
-                    <h3 class="text-4xl font-black text-gray-900">{{ $stats['mes_demandes'] }}</h3>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Demandes personnelles</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Main Content Grid -->
@@ -151,6 +238,7 @@
             </a>
             @endif
 
+            @if(Auth::user()->hasRole(['admin', 'gestionnaire']))
             <a href="{{ route('materiels.index') }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-ci-green hover:shadow-md transition-all group flex items-center justify-between">
                 <div>
                     <h4 class="text-sm font-black text-gray-900 mb-1">Consulter Inventaire</h4>
@@ -160,6 +248,7 @@
                     <i class="fa-solid fa-desktop"></i>
                 </div>
             </a>
+            @endif
         </div>
     </div>
 </x-app-layout>

@@ -21,33 +21,33 @@
 
         <!-- Dashboard Navigation & Search + ACTION BUTTON -->
         <div class="bg-white p-4 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col xl:flex-row items-center justify-between gap-6">
-            <div class="flex flex-col lg:flex-row items-center gap-6 w-full xl:w-auto">
+            <div class="flex flex-col xl:flex-row items-center gap-4 w-full xl:w-auto">
                 <nav class="flex flex-wrap gap-2 p-1.5 bg-gray-50 rounded-2xl border border-gray-100/50">
                     <button @click="activeTab = 'villes'" :class="activeTab === 'villes' ? 'bg-white shadow-sm text-ci-green' : 'text-gray-400 hover:text-gray-600'" 
-                        class="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center">
+                        class="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all flex items-center">
                         <i class="fa-solid fa-location-dot mr-2"></i> Villes
                     </button>
                     <!-- ... autres boutons de nav ... -->
                     <button @click="activeTab = 'directions'" :class="activeTab === 'directions' ? 'bg-white shadow-sm text-ci-green' : 'text-gray-400 hover:text-gray-600'" 
-                        class="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center">
+                        class="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all flex items-center">
                         <i class="fa-solid fa-building mr-2"></i> Directions
                     </button>
                     <button @click="activeTab = 'services'" :class="activeTab === 'services' ? 'bg-white shadow-sm text-ci-orange' : 'text-gray-400 hover:text-gray-600'" 
-                        class="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center">
+                        class="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all flex items-center">
                         <i class="fa-solid fa-briefcase mr-2"></i> Services
                     </button>
                     <button @click="activeTab = 'bureaux'" :class="activeTab === 'bureaux' ? 'bg-white shadow-sm text-slate-800' : 'text-gray-400 hover:text-gray-600'" 
-                        class="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center">
+                        class="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all flex items-center">
                         <i class="fa-solid fa-door-open mr-2"></i> Bureaux
                     </button>
                 </nav>
 
                 <!-- NEW BUTTON POSITION: Right next to tabs to be sure it's visible -->
-                <div x-show="activeTab !== 'add'" x-transition>
+                <div x-show="activeTab !== 'add'" x-transition class="flex-shrink-0">
                     <button @click="addType = activeTab.slice(0, -1); activeTab = 'add'" 
-                        class="inline-flex items-center px-6 py-3.5 bg-ci-green text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-ci-green/10 hover:scale-105 transition-all active:scale-95 whitespace-nowrap">
+                        class="inline-flex items-center px-6 py-3.5 bg-ci-green text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-ci-green/10 hover:scale-105 transition-all active:scale-95">
                         <i class="fa-solid fa-plus-circle text-white mr-3"></i> 
-                        Ajouter <span x-text="activeTab === 'villes' ? 'une Ville' : (activeTab === 'directions' ? 'une Direction' : (activeTab === 'services' ? 'un Service' : 'un Bureau'))"></span>
+                        Ajouter&nbsp;<span x-text="activeTab === 'villes' ? 'une Ville' : (activeTab === 'directions' ? 'une Direction' : (activeTab === 'services' ? 'un Service' : 'un Bureau'))"></span>
                     </button>
                 </div>
             </div>

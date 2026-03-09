@@ -1,9 +1,6 @@
 <div class="flex flex-col h-full text-white">
-    <!-- Sidebar spacing since logo is in topbar -->
-    <div class="h-6"></div>
-
-    <!-- Navigation -->
-    <nav class="flex-1 px-4 py-8 space-y-2">
+    <!-- Navigation (Scrollable Zone) -->
+    <nav class="flex-1 min-h-0 px-4 py-8 space-y-2 overflow-y-auto sidebar-scroll">
         <!-- Section: Personnel -->
         <div class="pb-2">
             <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Personnel</p>
@@ -11,20 +8,9 @@
         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="fa-chart-pie">
             Tableau de bord
         </x-nav-link>
-<<<<<<< HEAD
-
-        @if(!Auth::user()->hasRole(['admin', 'gestionnaire']))
-            <x-nav-link :href="route('demandes.index')" :active="request()->routeIs('demandes.index')"
-                icon="fa-file-invoice">
-                {{ Auth::user()->hasRole('agent') ? 'Mes Demandes' : 'Suivi des Dossiers' }}
-            </x-nav-link>
-        @endif
-=======
         <x-nav-link :href="route('demandes.index')" :active="request()->routeIs('demandes.index')" icon="fa-file-invoice">
             {{ Auth::user()->hasRole('agent') ? 'Mes Demandes' : 'Suivi des Dossiers' }}
         </x-nav-link>
-
->>>>>>> d518b1d (Amelioration front admin et fonctionnalité et debut d'amélioration Gestionnaire)
         @if(Auth::user()->hasRole(['agent', 'chef_cdi', 'DR']))
             <x-nav-link :href="route('mon-materiel.index')" :active="request()->routeIs('mon-materiel.*')" icon="fa-laptop">
                 @php
@@ -39,7 +25,7 @@
         @endif
 
         <!-- Section: Validations (Contextual based on role) -->
-        @if(Auth::user()->hasRole(['chef_cdi', 'DR', 'gestionnaire', 'SDREVT', 'DSI']))
+        @if(Auth::user()->hasRole(['chef_cdi', 'DR', 'gestionnaire', 'SDGRTE', 'DSI']))
             <div class="pt-6 pb-2">
                 <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Validations</p>
             </div>
@@ -52,14 +38,14 @@
                 </x-nav-link>
             @endif
 
-            @if(Auth::user()->hasRole(['DR', 'gestionnaire', 'SDREVT', 'DSI']))
+            @if(Auth::user()->hasRole(['DR', 'gestionnaire', 'SDGRTE', 'DSI']))
                 <x-nav-link :href="route('validations.index')" :active="request()->routeIs('validations.*')"
                     icon="fa-check-double">
                     @php
                         $label = match (Auth::user()->role) {
                             'DR' => 'Validation DR',
                             'gestionnaire' => 'Dotation Matériel',
-                            'SDREVT' => 'Validation SDREVT',
+                            'SDGRTE' => 'Validation SDGRTE',
                             'DSI' => 'Validation Finale DSI',
                             default => 'Mes Validations'
                         };
@@ -111,9 +97,9 @@
     <!-- Footer Logout Area -->
     <div class="p-6 mt-auto">
         <button @click="showLogoutModal = true"
-            class="w-full flex items-center px-4 py-3 text-sm font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-2xl transition-all group">
+            class="w-full flex items-center px-4 py-3 text-sm font-bold text-white/50 hover:text-white hover:bg-white/5 rounded-2xl transition-colors group">
             <i
-                class="fa-solid fa-arrow-right-from-bracket mr-4 text-white/50 group-hover:text-ci-orange transition-colors"></i>
+                class="fa-solid fa-arrow-right-from-bracket mr-4 text-white/30 group-hover:text-white transition-colors"></i>
             Déconnexion
         </button>
     </div>

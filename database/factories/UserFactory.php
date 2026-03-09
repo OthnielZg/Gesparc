@@ -70,9 +70,9 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => ['role' => 'gestionnaire']);
     }
 
-    public function sdrevt(): static
+    public function sdgrte(): static
     {
-        return $this->state(fn (array $attributes) => ['role' => 'SDREVT']);
+        return $this->state(fn (array $attributes) => ['role' => 'SDGRTE']);
     }
 
     public function dsi(): static

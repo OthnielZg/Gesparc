@@ -63,6 +63,7 @@ class FinalisationSedmiTest extends TestCase
 
         // 2. Créer une demande avec ce matériel retenu
         $demande = Demande::factory()->valideeDsi()->create([
+            'decision_dsi' => 'autre',
             'materiel_retenu_dsi' => 'Dell Latitude (SN-FINAL-TEST)',
         ]);
 

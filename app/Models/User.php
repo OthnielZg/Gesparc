@@ -52,7 +52,7 @@ class User extends Authenticatable
 
     const ROLE_GESTIONNAIRE = 'gestionnaire';
 
-    const ROLE_SDREVT = 'SDREVT';
+    const ROLE_SDGRTE = 'SDGRTE';
 
     const ROLE_DSI = 'DSI';
 
@@ -69,7 +69,7 @@ class User extends Authenticatable
             self::ROLE_CHEF_CDI,
             self::ROLE_DR,
             self::ROLE_GESTIONNAIRE,
-            self::ROLE_SDREVT,
+            self::ROLE_SDGRTE,
             self::ROLE_DSI,
         ];
     }
@@ -82,7 +82,7 @@ class User extends Authenticatable
             self::ROLE_CHEF_CDI => 'Chef CDI',
             self::ROLE_DR => 'Directeur Régional (DR)',
             self::ROLE_GESTIONNAIRE => 'Chef SEDMI (Gestionnaire)',
-            self::ROLE_SDREVT => 'SDREVT',
+            self::ROLE_SDGRTE => 'Chef SDGRTE',
             self::ROLE_DSI => 'DSI',
         ];
     }
@@ -126,9 +126,9 @@ class User extends Authenticatable
         return $this->role === self::ROLE_GESTIONNAIRE;
     }
 
-    public function isSDREVT(): bool
+    public function isSDGRTE(): bool
     {
-        return $this->role === self::ROLE_SDREVT;
+        return $this->role === self::ROLE_SDGRTE;
     }
 
     public function isDSI(): bool

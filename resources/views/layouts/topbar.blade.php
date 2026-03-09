@@ -9,13 +9,13 @@
             <!-- Mobile Menu Toggle (Visible only on small screens) -->
             <button type="button" 
                     @click="sidebarOpen = !sidebarOpen"
-                    class="md:hidden mr-4 p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 focus:outline-none transition-colors border border-transparent hover:border-white/10">
+                    class="md:hidden p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 focus:outline-none transition-colors border border-transparent hover:border-white/10">
                 <i class="fa-solid fa-bars text-xl"></i>
             </button>
 
                 <!-- Full Brand Logo with Link -->
-                <a href="{{ route('dashboard') }}" class="flex items-center group -ml-6">
-                    <img src="{{ asset('images/logo_dgi.png') }}" alt="Logo DGI" class="w-72 sm:w-96 max-h-14 object-contain transition-transform group-hover:scale-[1.02]">
+                <a href="{{ route('dashboard') }}" class="flex items-center group md:-ml-16 lg:-ml-20">
+                    <img src="{{ asset('images/logo_dgi.png') }}" alt="Logo DGI" class="w-36 sm:w-48 md:w-80 lg:w-96 max-h-14 object-contain transition-transform group-hover:scale-[1.02]">
                 </a>
         </div>
 
@@ -70,6 +70,7 @@
                      <!-- User Info Header -->
                      <div class="px-6 pb-4 mb-2 border-b border-gray-100">
                          <p class="text-sm font-black text-gray-900 leading-tight">{{ Auth::user()->full_name }}</p>
+                         <p class="text-[10px] font-black text-ci-orange uppercase tracking-widest mt-1">{{ Auth::user()->getRoleLabel() }}</p>
                          <p class="text-xs text-gray-400 mt-1">{{ Auth::user()->email }}</p>
                      </div>
 

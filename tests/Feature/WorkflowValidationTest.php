@@ -63,25 +63,26 @@ class WorkflowValidationTest extends TestCase
         $this->assertDatabaseHas('demandes', ['id' => $demande->id, 'statut' => 'rejetee']);
     }
 
-    // ─── Étape 5 : SDREVT — Valider proposition SEDMI ────────────────────
+    // ─── Étape 5 : SDGRTE — Valider proposition SEDMI ────────────────────
 
     public function test_sdrevt_peut_valider_proposition_sedmi(): void
     {
+        $this->withoutExceptionHandling();
         $agent = $this->makeUser('agent');
-        $sdrevt = $this->makeUser('SDREVT');
-        $demande = $this->makeDemande('proposition_sdrevt', $agent);
+        $sdgrte = $this->makeUser('SDGRTE');
+        $demande = $this->makeDemande('proposition_sdgrte', $agent);
         $demande->update(['materiel_propose' => 'Dell Latitude 5540 (SN-001)']);
 
-        $this->actingAs($sdrevt)->post(route('validations.store', $demande), [
+        $this->actingAs($sdgrte)->post(route('validations.store', $demande), [
             'decision' => 'OK',
-            'decision_sdrevt' => 'valide_sedmi',
+            'decision_sdgrte' => 'valide_sedmi',
             'commentaire' => 'Proposition SEDMI appropriée.',
         ]);
 
         $this->assertDatabaseHas('demandes', [
             'id' => $demande->id,
             'statut' => 'en_attente_dsi',
-            'decision_sdrevt' => 'valide_sedmi',
+            'decision_sdgrte' => 'valide_sedmi',
         ]);
     }
 
@@ -90,22 +91,22 @@ class WorkflowValidationTest extends TestCase
         $this->withoutExceptionHandling();
 
         $agent = $this->makeUser('agent');
-        $sdrevt = $this->makeUser('SDREVT');
-        $demande = $this->makeDemande('proposition_sdrevt', $agent);
+        $sdgrte = $this->makeUser('SDGRTE');
+        $demande = $this->makeDemande('proposition_sdgrte', $agent);
         $demande->update(['materiel_propose' => 'Dell Latitude 5540 (SN-001)']);
 
-        $this->actingAs($sdrevt)->post(route('validations.store', $demande), [
+        $this->actingAs($sdgrte)->post(route('validations.store', $demande), [
             'decision' => 'OK',
-            'decision_sdrevt' => 'contre_propose',
+            'decision_sdgrte' => 'contre_propose',
             'materiel_contre_propose' => 'HP EliteBook 840 G9',
             'reference_contre_propose' => 'HP-840G9-I7',
-            'justification_sdrevt' => 'Le HP offre de meilleures performances pour ce profil utilisateur.',
+            'justification_sdgrte' => 'Le HP offre de meilleures performances pour ce profil utilisateur.',
         ]);
 
         $this->assertDatabaseHas('demandes', [
             'id' => $demande->id,
             'statut' => 'en_attente_dsi',
-            'decision_sdrevt' => 'contre_propose',
+            'decision_sdgrte' => 'contre_propose',
             'materiel_contre_propose' => 'HP EliteBook 840 G9',
             'reference_contre_propose' => 'HP-840G9-I7',
         ]);
@@ -114,18 +115,18 @@ class WorkflowValidationTest extends TestCase
     public function test_sdrevt_contre_proposition_sans_justification_echoue(): void
     {
         $agent = $this->makeUser('agent');
-        $sdrevt = $this->makeUser('SDREVT');
-        $demande = $this->makeDemande('proposition_sdrevt', $agent);
+        $sdgrte = $this->makeUser('SDGRTE');
+        $demande = $this->makeDemande('proposition_sdgrte', $agent);
 
-        $this->actingAs($sdrevt)->post(route('validations.store', $demande), [
+        $this->actingAs($sdgrte)->post(route('validations.store', $demande), [
             'decision' => 'OK',
-            'decision_sdrevt' => 'contre_propose',
+            'decision_sdgrte' => 'contre_propose',
             'materiel_contre_propose' => 'HP EliteBook 840 G9',
-            // justification_sdrevt manquante intentionnellement
+            // justification_sdgrte manquante intentionnellement
         ]);
 
-        // La demande doit rester bloquée à proposition_sdrevt, pas transmise au DSI
-        $this->assertDatabaseHas('demandes', ['id' => $demande->id, 'statut' => 'proposition_sdrevt']);
+        // La demande doit rester bloquée à proposition_sdgrte, pas transmise au DSI
+        $this->assertDatabaseHas('demandes', ['id' => $demande->id, 'statut' => 'proposition_sdgrte']);
         $this->assertDatabaseMissing('demandes', ['id' => $demande->id, 'statut' => 'en_attente_dsi']);
     }
 
@@ -138,7 +139,7 @@ class WorkflowValidationTest extends TestCase
         $demande = $this->makeDemande('en_attente_dsi', $agent);
         $demande->update([
             'materiel_propose' => 'Dell Latitude 5540',
-            'decision_sdrevt' => 'valide_sedmi',
+            'decision_sdgrte' => 'valide_sedmi',
         ]);
 
         $this->actingAs($dsi)->post(route('validations.store', $demande), [
@@ -155,28 +156,28 @@ class WorkflowValidationTest extends TestCase
         ]);
     }
 
-    public function test_dsi_peut_retenir_contre_proposition_sdrevt(): void
+    public function test_dsi_peut_retenir_contre_proposition_sdgrte(): void
     {
         $agent = $this->makeUser('agent');
         $dsi = $this->makeUser('DSI');
         $demande = $this->makeDemande('en_attente_dsi', $agent);
         $demande->update([
             'materiel_propose' => 'Dell Latitude 5540',
-            'decision_sdrevt' => 'contre_propose',
+            'decision_sdgrte' => 'contre_propose',
             'materiel_contre_propose' => 'HP EliteBook 840 G9',
-            'justification_sdrevt' => 'Meilleures performances.',
+            'justification_sdgrte' => 'Meilleures performances.',
         ]);
 
         $this->actingAs($dsi)->post(route('validations.store', $demande), [
             'decision' => 'OK',
-            'decision_dsi' => 'retient_sdrevt',
+            'decision_dsi' => 'retient_sdgrte',
             'commentaire_dsi' => 'La contre-proposition est justifiée.',
         ]);
 
         $this->assertDatabaseHas('demandes', [
             'id' => $demande->id,
             'statut' => 'validee_dsi',
-            'decision_dsi' => 'retient_sdrevt',
+            'decision_dsi' => 'retient_sdgrte',
             'materiel_retenu_dsi' => 'HP EliteBook 840 G9',
         ]);
     }
@@ -188,7 +189,7 @@ class WorkflowValidationTest extends TestCase
         $demande = $this->makeDemande('en_attente_dsi', $agent);
         $demande->update([
             'materiel_propose' => 'Dell Latitude 5540',
-            'decision_sdrevt' => 'valide_sedmi',
+            'decision_sdgrte' => 'valide_sedmi',
         ]);
 
         $this->actingAs($dsi)->post(route('validations.store', $demande), [

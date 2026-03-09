@@ -7,9 +7,11 @@
                 </h2>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Base de données du patrimoine IT • DGI</p>
             </div>
+            @if(auth()->user()->role !== 'admin')
             <a href="{{ route('materiels.create') }}" class="inline-flex items-center px-8 py-4 bg-ci-green text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-green-900/10 hover:scale-105 transition-all active:scale-95">
                 <i class="fa-solid fa-plus mr-3"></i> Ajouter un Matériel
             </a>
+            @endif
         </div>
     </x-slot>
 
@@ -115,8 +117,10 @@
                                 </div>
                             </td>
                             <td class="px-8 py-6">
-                                <span class="px-3 py-1 bg-gray-50 text-gray-500 rounded-lg text-[9px] font-black uppercase tracking-widest border border-gray-100 group-hover:bg-white">
-                                    {{ $materiel->categorie }}
+                                <span class="inline-flex items-center px-3 py-1.5 bg-gray-50 rounded-xl border border-gray-100 group-hover:bg-white transition-all" title="{{ $materiel->categorie }}">
+                                    <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest max-w-[100px] truncate block">
+                                        {{ $materiel->categorie }}
+                                    </span>
                                 </span>
                             </td>
                             <td class="px-8 py-6 text-center">

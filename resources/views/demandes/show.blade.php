@@ -12,27 +12,36 @@
 
     <!-- Workflow Stepper -->
     <!-- Workflow Stepper (Premium Design) -->
-    <div class="mb-10">
+    <div class="mb-6">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-gray-100 overflow-hidden relative">
             <div class="absolute top-0 left-0 w-full h-1 bg-gray-50"></div>
             
             @php
                 $steps = [
-                    ['statut' => 'pre_demande', 'label' => 'Signalement', 'role' => 'Agent', 'icon' => 'fa-paper-plane'],
-                    ['statut' => 'en_attente_dr', 'label' => 'Officialisation', 'role' => 'Chef CDI', 'icon' => 'fa-file-signature'],
-                    ['statut' => 'transmise_gestionnaire', 'label' => 'Analyse DR', 'role' => 'Dir. Régional', 'icon' => 'fa-magnifying-glass-chart'],
-                    ['statut' => 'proposition_sdrevt', 'label' => 'Stock SEDMI', 'role' => 'Gestionnaire', 'icon' => 'fa-boxes-packing'],
-                    ['statut' => 'en_attente_dsi', 'label' => 'SDREVT', 'role' => 'Resp. Matériel', 'icon' => 'fa-user-check'],
-                    ['statut' => 'validee', 'label' => 'Décision DSI', 'role' => 'Directeur SI', 'icon' => 'fa-award'],
+                    ['statut' => 'creee', 'label' => 'Signalement', 'role' => $demande->utilisateur->getRoleLabel(), 'icon' => 'fa-paper-plane'],
+                    ['statut' => 'pre_demande', 'label' => 'Officialisation', 'role' => 'Chef CDI', 'icon' => 'fa-file-signature'],
+                    ['statut' => 'en_attente_dr', 'label' => 'Analyse DR', 'role' => 'Dir. Régional', 'icon' => 'fa-magnifying-glass-chart'],
+                    ['statut' => 'transmise_gestionnaire', 'label' => 'Stock SEDMI', 'role' => 'Gestionnaire', 'icon' => 'fa-boxes-packing'],
+                    ['statut' => 'proposition_sdgrte', 'label' => 'SDGRTE', 'role' => 'Resp. Matériel', 'icon' => 'fa-user-check'],
+                    ['statut' => 'en_attente_dsi', 'label' => 'Décision DSI', 'role' => 'Directeur SI', 'icon' => 'fa-award'],
                 ];
                 $currentIdx = 0;
                 $isTerminal = in_array($demande->statut, ['validee', 'rejetee', 'annulee']);
+                $isFailed = in_array($demande->statut, ['rejetee', 'annulee']);
                 
                 foreach($steps as $idx => $step) {
                     if($demande->statut == $step['statut']) $currentIdx = $idx;
                 }
-                if($demande->statut == 'validee') $currentIdx = 5;
-                $isFailed = in_array($demande->statut, ['rejetee', 'annulee']);
+                
+                // Si la demande est validée, toutes les étapes sont terminées (vert index fictif > 5)
+                if($demande->statut == 'validee') $currentIdx = 6;
+                
+                // Gestion du rejet (Optionnel : si rejetée, elle reste bloquée sur la dernière validation)
+                if($isFailed && $demande->validations->count() > 0) {
+                    $dernierStatut = $demande->validations->last()->niveau_validation;
+                    $rejetMap = ['chef_cdi' => 1, 'DR' => 2, 'gestionnaire' => 3, 'SDGRTE' => 4, 'DSI' => 5];
+                    $currentIdx = $rejetMap[$dernierStatut] ?? 0;
+                }
             @endphp
 
             <div class="flex items-center justify-between relative px-4">
@@ -67,18 +76,18 @@
         </div>
     </div>
 
-    <!-- Details Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Left: Info -->
-        <div class="lg:col-span-2 space-y-8">
+    <!-- Details Content (Layout 50/50) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Left: Infos & Historique -->
+        <div class="space-y-8">
             <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                 <div class="flex justify-between items-start mb-8">
                     <div>
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Informations Générales</p>
-                        <h3 class="text-2xl font-black text-gray-900 tracking-tighter">{{ $demande->reference }}</h3>
+                        <h3 class="text-lg font-black text-gray-900 tracking-tighter">{{ $demande->reference }}</h3>
                     </div>
-                    <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest 
-                        bg-{{ $demande->statut_color }}-50 text-{{ $demande->statut_color == 'green' ? 'ci-green' : ($demande->statut_color == 'orange' ? 'ci-orange' : $demande->statut_color) }}-600">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest 
+                        bg-{{ $demande->statut_color }}-50 text-{{ $demande->statut_color == 'green' ? 'ci-green' : ($demande->statut_color == 'orange' ? 'ci-orange' : $demande->statut_color) }}-600 shadow-sm border border-{{ $demande->statut_color == 'green' ? 'green' : ($demande->statut_color == 'orange' ? 'orange' : $demande->statut_color) }}-100/50">
                         {{ $demande->statut_label }}
                     </span>
                 </div>
@@ -87,7 +96,8 @@
                     <div>
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Demandeur</p>
                         <p class="text-sm font-bold text-gray-900">{{ $demande->utilisateur->full_name }}</p>
-                        <p class="text-xs text-gray-500">{{ $demande->utilisateur->email }}</p>
+                        <p class="text-[10px] font-bold text-ci-orange uppercase mt-0.5">{{ $demande->utilisateur->getRoleLabel() }}</p>
+                        <p class="text-xs text-gray-500 mt-1">{{ $demande->utilisateur->email }}</p>
                     </div>
                     <div>
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Catégorie</p>
@@ -129,40 +139,40 @@
             @endif
         </div>
 
-        <!-- Right: Actions -->
+        <!-- Right: Actions & Décisions -->
         <div class="space-y-8">
-            <!-- Role-Based Context Box -->
-            <div class="bg-ci-green-dark p-8 rounded-[2.5rem] shadow-2xl text-white relative overflow-hidden">
-                <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
-                <h4 class="text-[10px] font-black text-ci-orange uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                    <span class="h-1 w-4 bg-ci-orange rounded-full"></span> 
-                    Actions Décisives
+            <!-- Context Box (Sober Design) -->
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 relative overflow-hidden transition-all hover:shadow-lg">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                <h4 class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    <span class="h-1 w-3 bg-ci-green rounded-full"></span> 
+                    Décision
                 </h4>
                 
                 @php $user = Auth::user(); @endphp
 
                 <!-- Action Chef CDI -->
                 @if($user->hasRole('chef_cdi') && $demande->statut == 'pre_demande')
-                    <form action="{{ route('demandes.officialise', $demande) }}" method="POST">
+                    <form action="{{ route('demandes.officialise', $demande) }}" method="POST" class="mb-4">
                         @csrf
-                        <button type="submit" class="w-full py-5 bg-white text-ci-green-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-black/20 group">
+                        <button type="submit" class="w-full py-5 bg-ci-green-dark text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-green-900/10 group">
                             <i class="fa-solid fa-file-circle-check mr-2 group-hover:rotate-12 transition-transform"></i> Officialiser le besoin
                         </button>
                     </form>
                 @endif
 
                 @php
-                    $statusMap = ['DR' => 'en_attente_dr', 'gestionnaire' => 'transmise_gestionnaire', 'SDREVT' => 'proposition_sdrevt', 'DSI' => 'en_attente_dsi'];
+                    $statusMap = ['DR' => 'en_attente_dr', 'gestionnaire' => 'transmise_gestionnaire', 'SDGRTE' => 'proposition_sdgrte', 'DSI' => 'en_attente_dsi'];
                     $canValidate = ($statusMap[$user->role] ?? null) === $demande->statut;
                 @endphp
 
                 {{-- ═══ FORMULAIRE STANDARD (DR, Gestionnaire) ═══ --}}
-                @if($canValidate && !$user->isSDREVT() && !$user->isDSI())
+                @if($canValidate && !$user->isSDGRTE() && !$user->isDSI())
                     <div class="space-y-4" x-data="{ open: false, decision: 'OK' }">
-                        <button @click="open = true; decision = 'OK'" class="w-full py-5 bg-white text-ci-green-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl group">
-                            <i class="fa-solid fa-check-double mr-2 text-ci-orange group-hover:scale-125 transition-transform"></i> Valider le dossier
+                        <button @click="open = true; decision = 'OK'" class="w-full py-5 bg-ci-green text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-green-900/10 group">
+                            <i class="fa-solid fa-check-double mr-2 group-hover:scale-125 transition-transform"></i> Approuver le dossier
                         </button>
-                        <button @click="open = true; decision = 'KO'" class="w-full py-4 bg-transparent border-2 border-white/20 text-white/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-red-500/50 hover:text-red-400 transition-all">
+                        <button @click="open = true; decision = 'KO'" class="w-full py-4 bg-white border-2 border-gray-100 text-gray-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-red-500/30 hover:text-red-500 transition-all">
                             Rejeter ce dossier
                         </button>
 
@@ -172,144 +182,138 @@
                              x-transition:enter-start="opacity-0"
                              x-transition:enter-end="opacity-100">
                             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md"></div>
-                            <div class="relative bg-white w-full max-w-lg p-10 rounded-[3rem] shadow-2xl text-gray-900"
+                            <div class="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl text-gray-900 overflow-hidden flex flex-col"
                                  x-transition:enter="transition ease-out duration-300"
                                  x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                                  x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                                  @click.away="open = false">
-                                <div class="flex items-center gap-4 mb-8">
-                                    <div class="h-16 w-16 rounded-3xl flex items-center justify-center" :class="decision == 'OK' ? 'bg-green-50 text-ci-green' : 'bg-red-50 text-red-500'">
-                                        <i class="fa-solid text-2xl" :class="decision == 'OK' ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
+                                
+                                <!-- Modal Header -->
+                                <div class="px-8 pt-8 pb-4 flex items-center gap-4 bg-white/50 backdrop-blur-sm border-b border-gray-50">
+                                    <div class="h-12 w-12 rounded-2xl flex items-center justify-center flex-shrink-0" :class="decision == 'OK' ? 'bg-green-50 text-ci-green' : 'bg-red-50 text-red-500'">
+                                        <i class="fa-solid text-xl" :class="decision == 'OK' ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
                                     </div>
                                     <div>
-                                        <h3 class="text-2xl font-black tracking-tighter" x-text="decision == 'OK' ? 'Valider le dossier' : 'Rejeter le dossier'"></h3>
-                                        <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Enregistrement de décision</p>
+                                        <h3 class="text-xl font-black tracking-tighter leading-none" x-text="decision == 'OK' ? 'Valider le dossier' : 'Rejeter le dossier'"></h3>
+                                        <p class="text-[9px] font-black uppercase text-gray-400 tracking-[0.2em] mt-1">DGI • Décision Officielle</p>
                                     </div>
                                 </div>
-                                <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-6">
+
+                                <form action="{{ route('validations.store', $demande) }}" method="POST" class="flex flex-col h-full overflow-hidden">
                                     @csrf
                                     <input type="hidden" name="decision" :value="decision">
-                                    @if($user->isGestionnaire())
-                                        <div class="space-y-2">
-                                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Matériel proposé (Stock SEDMI)</label>
-                                            <select name="id_materiel" required class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-ci-green rounded-2xl text-sm font-bold outline-none transition-all">
-                                                <option value="">Sélectionner une unité...</option>
-                                                @foreach($materielsDisponibles as $m)
-                                                    <option value="{{ $m->id }}">{{ $m->marque }} {{ $m->modele }} — S/N: {{ $m->numero_serie }}</option>
-                                                @endforeach
-                                            </select>
+                                    
+                                    <!-- Modal Body (Scrollable) -->
+                                    <div class="px-8 py-6 max-h-[60vh] overflow-y-auto custom-scrollbar-minimal space-y-6">
+                                        @if($user->isGestionnaire())
+                                            <div class="bg-gray-50/50 p-5 rounded-3xl space-y-4 border border-gray-100 relative overflow-hidden">
+                                                <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-2">
+                                                    <i class="fa-solid fa-boxes-packing text-ci-green"></i> 
+                                                    Proposition Stock
+                                                </h4>
+
+                                                <div class="space-y-1.5">
+                                                    <label class="text-[8px] font-black text-gray-400 uppercase tracking-widest block ml-1">Unité Sélectionnée *</label>
+                                                    <div class="relative group">
+                                                        <select name="id_materiel" required class="w-full px-4 py-3 bg-white border border-gray-200 focus:border-ci-green focus:ring-0 rounded-2xl text-[13px] font-bold shadow-sm outline-none transition-all text-gray-700 appearance-none cursor-pointer">
+                                                            <option value="">Choisir un matériel...</option>
+                                                            @foreach($materielsDisponibles as $m)
+                                                                <option value="{{ $m->id }}">{{ $m->marque }} {{ $m->modele }} (S/N: {{ $m->numero_serie }})</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <span class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                                                            <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="space-y-1.5">
+                                                    <label class="text-[8px] font-black text-gray-400 uppercase tracking-widest block ml-1">Précisions (Optionnel)</label>
+                                                    <textarea name="note_gestionnaire" placeholder="Infos techniques..." class="w-full px-4 py-3 bg-white border border-gray-200 focus:border-ci-green focus:ring-0 rounded-2xl text-[13px] font-bold shadow-sm outline-none transition-all text-gray-600 h-20 resize-none"></textarea>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        
+                                        <div class="space-y-1.5">
+                                            <label class="text-[8px] font-black text-gray-400 uppercase tracking-widest block ml-1">Votre Commentaire</label>
+                                            <textarea name="commentaire" placeholder="Observations générales..." class="w-full px-4 py-3 bg-gray-50/80 border border-gray-100 focus:border-ci-green focus:bg-white focus:ring-0 rounded-2xl text-[13px] font-bold outline-none h-24 transition-all resize-none text-gray-600"></textarea>
                                         </div>
-                                        <div class="space-y-2">
-                                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Note technique (Optionnel)</label>
-                                            <textarea name="note_gestionnaire" placeholder="Justification du choix..." class="w-full p-5 bg-gray-50 border-2 border-transparent focus:border-ci-green rounded-2xl text-sm font-bold outline-none h-24"></textarea>
-                                        </div>
-                                    @endif
-                                    <div class="space-y-2">
-                                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Commentaire (Optionnel)</label>
-                                        <textarea name="commentaire" placeholder="Ajoutez un commentaire..." class="w-full p-5 bg-gray-50 border-2 border-transparent focus:border-ci-green rounded-2xl text-sm font-bold outline-none h-28"></textarea>
                                     </div>
-                                    <div class="flex gap-4 pt-4">
-                                        <button type="button" @click="open = false" class="flex-1 py-4 text-gray-400 font-black uppercase tracking-widest text-[10px]">Abandonner</button>
-                                        <button type="submit" class="flex-1 py-4 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all hover:scale-105 active:scale-95"
+
+                                    <!-- Modal Footer (Fixed) -->
+                                    <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex gap-4">
+                                        <button type="button" @click="open = false" class="flex-1 py-4 text-gray-400 font-black uppercase tracking-widest text-[10px] hover:text-gray-600 transition-colors">Abroger</button>
+                                        <button type="submit" class="flex-[2] py-4 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
                                                 :class="decision == 'OK' ? 'bg-ci-green shadow-green-900/10' : 'bg-red-600 shadow-red-900/10'">
-                                            Signer ma décision
+                                            <i class="fa-solid fa-signature"></i>
+                                            Signer la Décision
                                         </button>
                                     </div>
                                 </form>
                             </div>
+
                         </div>
                     </div>
                 @endif
 
-                {{-- ═══ FORMULAIRE SDREVT — Valider ou Contre-proposer ═══ --}}
-                @if($canValidate && $user->isSDREVT())
-                    <div x-data="{ choix: 'valide_sedmi', rejet: false }">
+                {{-- Section Validation SDGRTE (Version Compacte) --}}
+                @if($canValidate && $user->isSDGRTE())
+                    <div x-data="{ choix: 'valide_sedmi', rejet: false }" class="mt-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+                            <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">Arbitrage SDGRTE</h4>
+                            <i class="fa-solid fa-microchip text-gray-300 text-sm"></i>
+                        </div>
 
-                        {{-- Rappel proposition SEDMI --}}
+                        {{-- Proposition SEDMI --}}
                         @if($demande->materiel_propose)
-                            <div class="mb-5 p-4 bg-white/10 rounded-2xl">
-                                <p class="text-[9px] font-black text-ci-orange uppercase tracking-widest mb-1">Proposition du Gestionnaire (SEDMI)</p>
-                                <p class="text-sm font-black text-white">{{ $demande->materiel_propose }}</p>
-                                @if($demande->commentaire_gestionnaire)
-                                    <p class="text-[10px] text-white/60 mt-1 italic">{{ $demande->commentaire_gestionnaire }}</p>
-                                @endif
+                            <div class="mb-3 p-3 bg-white rounded-xl border border-gray-100 flex items-center justify-between">
+                                <div>
+                                    <p class="text-[7px] font-black text-ci-orange uppercase tracking-widest mb-0.5">Offre SEDMI</p>
+                                    <p class="text-[11px] font-bold text-gray-900 leading-tight">{{ $demande->materiel_propose }}</p>
+                                </div>
+                                <i class="fa-solid fa-laptop-code text-gray-100 italic"></i>
                             </div>
                         @endif
 
-                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-5">
+                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-3">
                             @csrf
                             <input type="hidden" name="decision" value="OK">
-                            <input type="hidden" name="decision_sdrevt" :value="choix">
+                            <input type="hidden" name="decision_sdgrte" :value="choix">
 
-                            {{-- Choix SDREVT --}}
-                            <div class="space-y-3">
-                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block">Votre décision</label>
-                                <label class="flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all"
-                                       :class="choix === 'valide_sedmi' ? 'bg-white/20 border-2 border-white/40' : 'bg-white/5 border-2 border-transparent'">
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl cursor-pointer border transition-all"
+                                       :class="choix === 'valide_sedmi' ? 'bg-white border-ci-green/30 shadow-sm' : 'bg-white/50 border-gray-100'">
                                     <input type="radio" x-model="choix" value="valide_sedmi" class="hidden">
-                                    <div class="h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all"
-                                         :class="choix === 'valide_sedmi' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
-                                        <div x-show="choix === 'valide_sedmi'" class="h-2 w-2 rounded-full bg-white"></div>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-black text-white">✅ Valider la proposition SEDMI</p>
-                                        <p class="text-[9px] text-white/50 mt-0.5">Transmettre telle quelle au DSI</p>
-                                    </div>
+                                    <div class="h-3 w-3 rounded-full border-2" :class="choix === 'valide_sedmi' ? 'border-ci-green bg-ci-green' : 'border-gray-200'"></div>
+                                    <span class="text-[9px] font-black text-gray-700 uppercase">Valider</span>
                                 </label>
-
-                                <label class="flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all"
-                                       :class="choix === 'contre_propose' ? 'bg-orange-500/20 border-2 border-orange-400/40' : 'bg-white/5 border-2 border-transparent'">
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl cursor-pointer border transition-all"
+                                       :class="choix === 'contre_propose' ? 'bg-orange-50 border-ci-orange/30 shadow-sm' : 'bg-white/50 border-gray-100'">
                                     <input type="radio" x-model="choix" value="contre_propose" class="hidden">
-                                    <div class="h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all"
-                                         :class="choix === 'contre_propose' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
-                                        <div x-show="choix === 'contre_propose'" class="h-2 w-2 rounded-full bg-white"></div>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-black text-white">🔄 Soumettre une contre-proposition</p>
-                                        <p class="text-[9px] text-white/50 mt-0.5">Proposer un matériel alternatif au DSI</p>
-                                    </div>
+                                    <div class="h-3 w-3 rounded-full border-2" :class="choix === 'contre_propose' ? 'border-ci-orange bg-ci-orange' : 'border-gray-200'"></div>
+                                    <span class="text-[9px] font-black text-gray-700 uppercase">Ajuster</span>
                                 </label>
                             </div>
 
-                            {{-- Champs contre-proposition --}}
-                            <div x-show="choix === 'contre_propose'" x-collapse class="space-y-4 pt-2">
-                                <div>
-                                    <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Matériel alternatif proposé *</label>
-                                    <input type="text" name="materiel_contre_propose"
-                                           placeholder="Ex: HP EliteBook 840 G9"
-                                           class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Référence / Modèle</label>
-                                    <input type="text" name="reference_contre_propose"
-                                           placeholder="Ex: HP-840G9-I7-16GB"
-                                           class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Justification *</label>
-                                    <textarea name="justification_sdrevt" rows="3"
-                                              placeholder="Pourquoi ce matériel alternatif est-il plus approprié ?"
-                                              class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all resize-none"></textarea>
-                                </div>
+                            <div x-show="choix === 'contre_propose'" x-collapse class="space-y-2 pt-1">
+                                <select name="materiel_contre_propose" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-bold outline-none">
+                                    <option value="">Catalogue {{ $demande->categorie_demandee }}</option>
+                                    @foreach($materielsCategorie as $mat)
+                                        <option value="{{ $mat->marque }} {{ $mat->modele }}">{{ $mat->marque }} {{ $mat->modele }}</option>
+                                    @endforeach
+                                </select>
+                                <textarea name="justification_sdgrte" rows="1" placeholder="Justification*" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-bold outline-none h-12"></textarea>
                             </div>
 
-                            <div>
-                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Commentaire (Optionnel)</label>
-                                <textarea name="commentaire" rows="2" placeholder="Note visible dans l'historique..."
-                                          class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all resize-none"></textarea>
+                            <textarea name="commentaire" rows="1" placeholder="Note finale (Optionnelle)" class="w-full px-3 py-2 bg-white border border-gray-100 rounded-xl text-[10px] font-bold outline-none h-10 resize-none"></textarea>
+
+                            <div class="flex gap-2">
+                                <button type="submit" class="flex-[3] py-3.5 bg-ci-green text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg shadow-green-900/10 active:scale-95 transition-all">Transmettre au DSI</button>
+                                <button type="button" @click="rejet = true" class="flex-1 py-3.5 bg-gray-100 text-gray-400 rounded-xl font-black text-[9px] uppercase hover:bg-red-50 hover:text-red-500 transition-all">Rejet</button>
                             </div>
-
-                            <button type="submit" class="w-full py-5 bg-white text-ci-green-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
-                                <i class="fa-solid fa-paper-plane mr-2"></i> Transmettre au DSI
-                            </button>
-
-                            <button type="button" @click="rejet = true"
-                                    class="w-full py-3 bg-transparent border-2 border-white/20 text-white/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-red-500/50 hover:text-red-400 transition-all">
-                                Rejeter ce dossier
-                            </button>
                         </form>
 
-                        {{-- Modal rejet SDREVT --}}
+                        {{-- Modal rejet SDGRTE --}}
                         <div x-show="rejet" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4">
                             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md" @click="rejet = false"></div>
                             <div class="relative bg-white w-full max-w-md p-10 rounded-[3rem] shadow-2xl text-gray-900">
@@ -330,93 +334,63 @@
                     </div>
                 @endif
 
-                {{-- ═══ FORMULAIRE DSI — Arbitrage final ═══ --}}
+                {{-- ═══ FORMULAIRE DSI (Version Compacte) ═══ --}}
                 @if($canValidate && $user->isDSI())
-                    <div x-data="{ choixDsi: 'retient_sedmi', rejet: false }">
-
-                        {{-- Proposition A (SEDMI) --}}
-                        <div class="mb-3 p-4 bg-white/10 rounded-2xl">
-                            <p class="text-[9px] font-black text-ci-orange uppercase tracking-widest mb-1">Proposition A — Gestionnaire SEDMI</p>
-                            <p class="text-sm font-black text-white">{{ $demande->materiel_propose ?? '—' }}</p>
+                    <div x-data="{ choixDsi: 'retient_sedmi', rejet: false }" class="mt-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+                            <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">Arbitrage Final DSI</h4>
+                            <i class="fa-solid fa-gavel text-gray-100 text-lg"></i>
                         </div>
 
-                        {{-- Proposition B (SDREVT) si elle existe --}}
-                        @if($demande->hasContreProposition())
-                            <div class="mb-5 p-4 bg-orange-500/20 border border-orange-400/30 rounded-2xl">
-                                <p class="text-[9px] font-black text-orange-300 uppercase tracking-widest mb-1">Proposition B — SDREVT (Contre-proposition)</p>
-                                <p class="text-sm font-black text-white">{{ $demande->materiel_contre_propose }}</p>
-                                @if($demande->justification_sdrevt)
-                                    <p class="text-[10px] text-white/60 mt-1 italic">{{ $demande->justification_sdrevt }}</p>
-                                @endif
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <div class="p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                                <p class="text-[6px] font-black text-ci-orange uppercase tracking-widest mb-0.5">Option A (Gestionnaire)</p>
+                                <p class="text-[10px] font-bold text-gray-900 truncate">{{ $demande->materiel_propose ?? '—' }}</p>
                             </div>
-                        @else
-                            <div class="mb-5 p-3 bg-white/5 rounded-2xl">
-                                <p class="text-[9px] text-white/40 uppercase tracking-widest">SDREVT a validé la proposition SEDMI sans contre-proposition.</p>
-                            </div>
-                        @endif
+                            @if($demande->hasContreProposition())
+                                <div class="p-2.5 bg-orange-50 rounded-xl border border-ci-orange/10">
+                                    <p class="text-[6px] font-black text-ci-orange uppercase tracking-widest mb-0.5">Option B (SDGRTE)</p>
+                                    <p class="text-[10px] font-bold text-gray-900 truncate">{{ $demande->materiel_contre_propose }}</p>
+                                </div>
+                            @else
+                                <div class="px-2.5 flex items-center justify-center bg-gray-50/30 border border-dashed border-gray-100 rounded-xl">
+                                    <p class="text-[7px] text-gray-300 font-bold uppercase">Consensus</p>
+                                </div>
+                            @endif
+                        </div>
 
-                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-5">
+                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-3">
                             @csrf
                             <input type="hidden" name="decision" value="OK">
                             <input type="hidden" name="decision_dsi" :value="choixDsi">
 
-                            <div class="space-y-3">
-                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block">Votre arbitrage</label>
-
-                                <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all"
-                                       :class="choixDsi === 'retient_sedmi' ? 'bg-white/20 border-2 border-white/40' : 'bg-white/5 border-2 border-transparent'">
-                                    <input type="radio" x-model="choixDsi" value="retient_sedmi" class="hidden">
-                                    <div class="h-5 w-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
-                                         :class="choixDsi === 'retient_sedmi' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
-                                        <div x-show="choixDsi === 'retient_sedmi'" class="h-2 w-2 rounded-full bg-white"></div>
-                                    </div>
-                                    <p class="text-xs font-black text-white">Retenir A (Proposition SEDMI)</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <label @click="choixDsi = 'retient_sedmi'" class="p-2.5 border rounded-xl cursor-pointer text-center transition-all"
+                                       :class="choixDsi === 'retient_sedmi' ? 'bg-ci-green/5 border-ci-green/30' : 'bg-white border-gray-100'">
+                                    <span class="text-[9px] font-black uppercase">Plan A</span>
                                 </label>
-
                                 @if($demande->hasContreProposition())
-                                    <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all"
-                                           :class="choixDsi === 'retient_sdrevt' ? 'bg-orange-500/20 border-2 border-orange-400/40' : 'bg-white/5 border-2 border-transparent'">
-                                        <input type="radio" x-model="choixDsi" value="retient_sdrevt" class="hidden">
-                                        <div class="h-5 w-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
-                                             :class="choixDsi === 'retient_sdrevt' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
-                                            <div x-show="choixDsi === 'retient_sdrevt'" class="h-2 w-2 rounded-full bg-white"></div>
-                                        </div>
-                                        <p class="text-xs font-black text-white">Retenir B (Contre-proposition SDREVT)</p>
+                                    <label @click="choixDsi = 'retient_sdgrte'" class="p-2.5 border rounded-xl cursor-pointer text-center transition-all"
+                                           :class="choixDsi === 'retient_sdgrte' ? 'bg-ci-orange/5 border-ci-orange/30' : 'bg-white border-gray-100'">
+                                        <span class="text-[9px] font-black uppercase">Plan B</span>
                                     </label>
                                 @endif
-
-                                <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all"
-                                       :class="choixDsi === 'autre' ? 'bg-purple-500/20 border-2 border-purple-400/40' : 'bg-white/5 border-2 border-transparent'">
-                                    <input type="radio" x-model="choixDsi" value="autre" class="hidden">
-                                    <div class="h-5 w-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
-                                         :class="choixDsi === 'autre' ? 'border-ci-orange bg-ci-orange' : 'border-white/30'">
-                                        <div x-show="choixDsi === 'autre'" class="h-2 w-2 rounded-full bg-white"></div>
-                                    </div>
-                                    <p class="text-xs font-black text-white">Imposer une 3ᵉ option</p>
+                                <label @click="choixDsi = 'autre'" class="p-2.5 border rounded-xl cursor-pointer text-center transition-all"
+                                       :class="choixDsi === 'autre' ? 'bg-purple-50 border-purple-200' : 'bg-white border-gray-100'">
+                                    <i class="fa-solid fa-pen-nib text-[9px]"></i>
                                 </label>
                             </div>
 
                             <div x-show="choixDsi === 'autre'" x-collapse>
-                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Matériel imposé par le DSI *</label>
-                                <input type="text" name="materiel_retenu_dsi"
-                                       placeholder="Désignation précise du matériel..."
-                                       class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all">
+                                <input type="text" name="materiel_retenu_dsi" placeholder="Désignation précise*" class="w-full px-3 py-2 bg-gray-50 border border-purple-100 rounded-xl text-[10px] font-bold outline-none">
                             </div>
 
-                            <div>
-                                <label class="text-[10px] font-black text-white/60 uppercase tracking-widest block mb-1">Note de décision DSI</label>
-                                <textarea name="commentaire_dsi" rows="2" placeholder="Commentaire visible par tous les acteurs..."
-                                          class="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-2xl text-sm font-bold outline-none focus:border-ci-orange transition-all resize-none"></textarea>
+                            <textarea name="commentaire_dsi" rows="1" placeholder="Instructions (Optionnel)" class="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-bold outline-none h-12"></textarea>
+
+                            <div class="flex gap-2">
+                                <button type="submit" class="flex-[3] py-4 bg-ci-green-dark text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-xl shadow-green-900/10 active:scale-95 transition-all">Valider l'Arbitrage</button>
+                                <button type="button" @click="rejet = true" class="flex-1 py-4 bg-gray-100 text-gray-400 rounded-xl font-black text-[9px] uppercase hover:text-red-500 transition-all">Annuler</button>
                             </div>
-
-                            <button type="submit" class="w-full py-5 bg-white text-ci-green-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
-                                <i class="fa-solid fa-gavel mr-2"></i> Valider ma décision finale
-                            </button>
-
-                            <button type="button" @click="rejet = true"
-                                    class="w-full py-3 bg-transparent border-2 border-white/20 text-white/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-red-500/50 hover:text-red-400 transition-all">
-                                Annuler la demande
-                            </button>
                         </form>
 
                         {{-- Modal annulation DSI --}}

@@ -21,7 +21,7 @@ class ValidationController extends Controller
         $statusMap = [
             'DR' => 'en_attente_dr',
             'gestionnaire' => 'transmise_gestionnaire',
-            'SDREVT' => 'proposition_sdrevt',
+            'SDGRTE' => 'proposition_sdgrte',
             'DSI' => 'en_attente_dsi',
         ];
 
@@ -31,10 +31,35 @@ class ValidationController extends Controller
             return redirect()->route('demandes.index');
         }
 
-        $demandes = Demande::where('statut', $targetStatus)
-            ->with(['utilisateur.bureau.service', 'validations.utilisateur'])
-            ->latest()
-            ->paginate(10);
+        $query = Demande::where('statut', $targetStatus)
+            ->with(['utilisateur.bureau.service', 'validations.utilisateur']);
+
+        if ($user->hasRole('DR')) {
+            if ($user->id_direction) {
+                $idDirection = $user->id_direction;
+                $query->where(function ($q) use ($user, $idDirection) {
+                    $q->where('id_utilisateur', $user->id)
+                      ->orWhereHas('utilisateur.bureau.service', function ($serviceQuery) use ($idDirection) {
+                          $serviceQuery->where('id_direction', $idDirection);
+                      })
+                      ->orWhereHas('utilisateur', function ($userQuery) use ($idDirection) {
+                          $userQuery->where('id_direction', $idDirection);
+                      });
+                });
+            } elseif ($user->bureau && $user->bureau->service && $user->bureau->service->id_direction) {
+                $idDirection = $user->bureau->service->id_direction;
+                $query->where(function ($q) use ($user, $idDirection) {
+                    $q->where('id_utilisateur', $user->id)
+                      ->orWhereHas('utilisateur.bureau.service', function ($sQuery) use ($idDirection) {
+                          $sQuery->where('id_direction', $idDirection);
+                      });
+                });
+            } else {
+                $query->where('id_utilisateur', $user->id);
+            }
+        }
+
+        $demandes = $query->latest()->paginate(10);
 
         // Pour le Gestionnaire : charger les matériels disponibles pour la proposition
         $materielsDisponibles = collect();
@@ -84,17 +109,23 @@ class ValidationController extends Controller
             if ($user->role === 'DR') {
                 $demande->statut = 'transmise_gestionnaire';
             } elseif ($user->role === 'gestionnaire') {
-                $materiel = Materiel::findOrFail($validated['id_materiel']);
+                $idMateriel = $request->input('id_materiel');
+                if (!$idMateriel) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'id_materiel' => 'Vous devez sélectionner un matériel à proposer.',
+                    ]);
+                }
+                $materiel = Materiel::findOrFail($idMateriel);
                 $demande->materiel_propose = $materiel->marque.' '.$materiel->modele.' ('.$materiel->numero_serie.')';
                 $demande->commentaire_gestionnaire = $request->input('note_gestionnaire');
-                $demande->statut = 'proposition_sdrevt';
-            } elseif ($user->role === 'SDREVT') {
-                $decisionSdrevt = $request->input('decision_sdrevt', 'valide_sedmi');
-                $demande->decision_sdrevt = $decisionSdrevt;
+                $demande->statut = 'proposition_sdgrte';
+            } elseif ($user->role === 'SDGRTE') {
+                $decisionSdgrte = $request->input('decision_sdgrte', 'valide_sedmi');
+                $demande->decision_sdgrte = $decisionSdgrte;
 
-                if ($decisionSdrevt === 'contre_propose') {
+                if ($decisionSdgrte === 'contre_propose') {
                     // Valider que les champs obligatoires sont présents (dépend de la validation ci-dessus mais check supplémentaire)
-                    if (empty($request->input('materiel_contre_propose')) || empty($request->input('justification_sdrevt'))) {
+                    if (empty($request->input('materiel_contre_propose')) || empty($request->input('justification_sdgrte'))) {
                         // Pour les tests, lancer une exception de validation si manque
                         throw \Illuminate\Validation\ValidationException::withMessages([
                             'materiel_contre_propose' => 'Le matériel alternatif et la justification sont obligatoires.',
@@ -102,7 +133,7 @@ class ValidationController extends Controller
                     }
                     $demande->materiel_contre_propose = $request->input('materiel_contre_propose');
                     $demande->reference_contre_propose = $request->input('reference_contre_propose');
-                    $demande->justification_sdrevt = $request->input('justification_sdrevt');
+                    $demande->justification_sdgrte = $request->input('justification_sdgrte');
                 }
                 $demande->statut = 'en_attente_dsi';
 
@@ -114,7 +145,7 @@ class ValidationController extends Controller
                 // Déterminer le matériel retenu selon le choix DSI
                 if ($decisionDsi === 'retient_sedmi') {
                     $demande->materiel_retenu_dsi = $demande->materiel_propose;
-                } elseif ($decisionDsi === 'retient_sdrevt') {
+                } elseif ($decisionDsi === 'retient_sdgrte') {
                     $demande->materiel_retenu_dsi = $demande->materiel_contre_propose;
                 } elseif ($decisionDsi === 'autre') {
                     if (empty($request->input('materiel_retenu_dsi'))) {

@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('affectations', function (Blueprint $table) {
-            //
+            $table->date('date_remise')->nullable()->after('date_affectation');
+            $table->string('lieu_remise')->nullable()->after('date_remise');
+            $table->string('statut_bordereau')->default('brouillon')->after('lieu_remise');
         });
     }
 
@@ -22,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('affectations', function (Blueprint $table) {
-            //
+            $table->dropColumn(['date_remise', 'lieu_remise', 'statut_bordereau']);
         });
     }
 };

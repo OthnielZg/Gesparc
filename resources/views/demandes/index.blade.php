@@ -8,20 +8,11 @@
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Gestion du patrimoine informatique
                     • DGI</p>
             </div>
-<<<<<<< HEAD
-            @if(!Auth::user()->hasRole(['admin', 'gestionnaire']))
-                <a href="{{ route('demandes.create') }}"
-                    class="inline-flex items-center px-8 py-4 bg-ci-green text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-green-900/10 hover:scale-105 transition-all active:scale-95">
-                    <i class="fa-solid fa-plus mr-3"></i> Nouvelle Demande
-                </a>
-            @endif
-=======
             @unless(Auth::user()->hasRole(['admin', 'gestionnaire']))
             <a href="{{ route('demandes.create') }}" class="inline-flex items-center px-8 py-4 bg-ci-green text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-green-900/10 hover:scale-105 transition-all active:scale-95">
                 <i class="fa-solid fa-plus mr-3"></i> Nouvelle Demande
             </a>
             @endunless
->>>>>>> d518b1d (Amelioration front admin et fonctionnalité et debut d'amélioration Gestionnaire)
         </div>
     </x-slot>
 
@@ -79,21 +70,22 @@
                                     <div>
                                         <p class="text-xs font-black text-gray-900">{{ $demande->utilisateur->full_name }}
                                         </p>
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase">Agent DGI</p>
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase">{{ $demande->utilisateur->getRoleLabel() }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-8 py-6">
-                                <p class="text-xs font-black text-gray-900 uppercase tracking-tighter">
-                                    {{ $demande->categorie_demandee }}</p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span
-                                        class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md">Qté:
-                                        {{ $demande->quantite }}</span>
-                                    <span
-                                        class="text-[10px] font-black uppercase tracking-widest 
-                                            {{ $demande->priorite == 'urgente' ? 'text-red-500' : ($demande->priorite == 'haute' ? 'text-orange-500' : 'text-gray-400') }}">
-                                        • {{ $demande->priorite }}
+                                <p class="text-xs font-black text-gray-900 uppercase tracking-tight">
+                                    {{ $demande->categorie_demandee }}
+                                </p>
+                                <div class="flex items-center gap-2 mt-1.5">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                        Qté {{ $demande->quantite }}
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full
+                                        {{ $demande->priorite == 'urgente' ? 'bg-red-50 text-red-500' : ($demande->priorite == 'haute' ? 'bg-orange-50 text-orange-500' : 'bg-gray-100 text-gray-400') }}">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-current flex-shrink-0"></span>
+                                        {{ $demande->priorite }}
                                     </span>
                                 </div>
                             </td>
@@ -103,7 +95,7 @@
                                         'pre_demande' => 'bg-blue-50 text-blue-600 border-blue-100',
                                         'en_attente_dr' => 'bg-amber-50 text-amber-600 border-amber-100',
                                         'transmise_gestionnaire' => 'bg-orange-50 text-orange-600 border-orange-100',
-                                        'proposition_sdrevt' => 'bg-purple-50 text-purple-600 border-purple-100',
+                                        'proposition_sdgrte' => 'bg-purple-50 text-purple-600 border-purple-100',
                                         'en_attente_dsi' => 'bg-indigo-50 text-indigo-600 border-indigo-100',
                                         'validee' => 'bg-green-50 text-ci-green border-green-100',
                                         'rejetee' => 'bg-red-50 text-red-600 border-red-100',

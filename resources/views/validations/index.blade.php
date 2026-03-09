@@ -25,7 +25,7 @@
                         @if(Auth::user()->isGestionnaire())
                             <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100 text-center">Priorité</th>
                         @endif
-                        @if(Auth::user()->isSDREVT())
+                        @if(Auth::user()->isSDGRTE())
                             <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100">Proposition SEDMI</th>
                         @endif
                         @if(Auth::user()->isDSI())
@@ -87,8 +87,8 @@
                                 </td>
                             @endif
 
-                            <!-- Colonne Proposition SEDMI (SDREVT) -->
-                            @if(Auth::user()->isSDREVT())
+                            <!-- Colonne Proposition SEDMI (SDGRTE) -->
+                            @if(Auth::user()->isSDGRTE())
                                 <td class="px-8 py-6">
                                     @if($demande->materiel_propose)
                                         <p class="text-xs font-black text-gray-900 uppercase tracking-tighter">{{ $demande->materiel_propose }}</p>
@@ -106,7 +106,7 @@
                                         <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest">A (SEDMI)</p>
                                         <p class="text-xs font-bold text-gray-800">{{ $demande->materiel_propose ?? '—' }}</p>
                                         @if($demande->hasContreProposition())
-                                            <p class="text-[9px] font-black text-orange-500 uppercase tracking-widest mt-1">B (SDREVT)</p>
+                                            <p class="text-[9px] font-black text-orange-500 uppercase tracking-widest mt-1">B (SDGRTE)</p>
                                             <p class="text-xs font-bold text-orange-700">{{ $demande->materiel_contre_propose }}</p>
                                         @endif
                                     </div>

@@ -20,10 +20,10 @@ class Demande extends Model
         'id_chef_cdi',
         'commentaire_gestionnaire',
         'materiel_propose',
-        // Étape 5 — SDREVT
-        'decision_sdrevt',
+        // Étape 5 — SDGRTE
+        'decision_sdgrte',
         'materiel_contre_propose',
-        'justification_sdrevt',
+        'justification_sdgrte',
         'reference_contre_propose',
         // Étape 6 — DSI
         'decision_dsi',
@@ -46,7 +46,7 @@ class Demande extends Model
             'pre_demande' => 'Pré-demande',
             'en_attente_dr' => 'En attente DR',
             'transmise_gestionnaire' => 'Chez le Gestionnaire',
-            'proposition_sdrevt' => 'Proposition au SDREVT',
+            'proposition_sdgrte' => 'Proposition au SDGRTE',
             'en_attente_dsi' => 'En attente DSI',
             'validee_dsi' => 'Validée par DSI',
             'en_finalisation' => 'En finalisation',
@@ -58,10 +58,9 @@ class Demande extends Model
         ];
     }
 
-    /** Indique si le SDREVT a soumis une contre-proposition */
     public function hasContreProposition(): bool
     {
-        return $this->decision_sdrevt === 'contre_propose' && ! empty($this->materiel_contre_propose);
+        return $this->decision_sdgrte === 'contre_propose' && ! empty($this->materiel_contre_propose);
     }
 
     /** Retourne le matériel finalement retenu par le DSI pour affichage */
@@ -69,7 +68,7 @@ class Demande extends Model
     {
         return match ($this->decision_dsi) {
             'retient_sedmi' => (string) $this->materiel_propose,
-            'retient_sdrevt' => (string) $this->materiel_contre_propose,
+            'retient_sdgrte' => (string) $this->materiel_contre_propose,
             'autre' => (string) $this->materiel_retenu_dsi,
             default => '—',
         };
@@ -81,7 +80,7 @@ class Demande extends Model
             'pre_demande' => 'blue',
             'en_attente_dr' => 'yellow',
             'transmise_gestionnaire' => 'orange',
-            'proposition_sdrevt' => 'purple',
+            'proposition_sdgrte' => 'purple',
             'en_attente_dsi' => 'indigo',
             'validee_dsi' => 'teal',
             'en_finalisation' => 'cyan',

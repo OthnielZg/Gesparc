@@ -28,23 +28,51 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
+        $user->fill($request->validated());
+
+        \Illuminate\Support\Facades\Log::info('Profile update attempt for user: ' . $user->id);
 
         if ($request->hasFile('photo')) {
+            \Illuminate\Support\Facades\Log::info('Photo file detected in request');
+            
             // Supprimer l'ancienne photo si elle existe
             if ($user->photo_path) {
+                \Illuminate\Support\Facades\Log::info('Deleting old photo: ' . $user->photo_path);
                 Storage::disk('public')->delete($user->photo_path);
             }
             
             // Sauvegarder la nouvelle photo
             $path = $request->file('photo')->store('profile-photos', 'public');
+            \Illuminate\Support\Facades\Log::info('New photo stored at: ' . $path);
             $user->photo_path = $path;
+        } else {
+            \Illuminate\Support\Facades\Log::info('No photo file detected in request');
         }
 
-        if ($user->isDirty()) {
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+        \Illuminate\Support\Facades\Log::info('User profile saved successfully');
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Delete the user's profile photo.
+     */
+    public function destroyPhoto(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->photo_path) {
+            Storage::disk('public')->delete($user->photo_path);
+            $user->photo_path = null;
             $user->save();
         }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.edit')->with('status', 'photo-deleted');
     }
 
     /**
