@@ -138,15 +138,14 @@ class ValidationController extends Controller
                 $demande->statut = 'en_attente_dsi';
 
             } elseif ($user->role === 'DSI') {
-                $decisionDsi = $request->input('decision_dsi', 'retient_sedmi');
+                $decisionDsi = $request->input('decision_dsi', 'valide_proposition');
                 $demande->decision_dsi = $decisionDsi;
                 $demande->commentaire_dsi = $request->input('commentaire_dsi');
 
                 // Déterminer le matériel retenu selon le choix DSI
-                if ($decisionDsi === 'retient_sedmi') {
-                    $demande->materiel_retenu_dsi = $demande->materiel_propose;
-                } elseif ($decisionDsi === 'retient_sdgrte') {
-                    $demande->materiel_retenu_dsi = $demande->materiel_contre_propose;
+                if ($decisionDsi === 'valide_proposition') {
+                    // Si on valide, on prend la contre-proposition s'il y en a une, sinon la proposition initiale
+                    $demande->materiel_retenu_dsi = $demande->hasContreProposition() ? $demande->materiel_contre_propose : $demande->materiel_propose;
                 } elseif ($decisionDsi === 'autre') {
                     if (empty($request->input('materiel_retenu_dsi'))) {
                         throw \Illuminate\Validation\ValidationException::withMessages([

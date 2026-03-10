@@ -10,11 +10,10 @@
         </div>
     </x-slot>
 
-    <!-- Workflow Stepper -->
-    <!-- Workflow Stepper (Premium Design) -->
-    <div class="mb-6">
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-gray-100 overflow-hidden relative">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gray-50"></div>
+    <!-- Workflow Stepper (Premium Ultra-Compact) -->
+    <div class="mb-4">
+        <div class="bg-white px-2 py-4 sm:p-5 rounded-3xl shadow-sm border border-gray-100 overflow-hidden relative">
+            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-gray-100 to-transparent"></div>
             
             @php
                 $steps = [
@@ -44,31 +43,31 @@
                 }
             @endphp
 
-            <div class="flex items-center justify-between relative px-4">
+            <div class="flex items-start justify-between relative px-2">
                 @foreach($steps as $idx => $step)
-                    <div class="flex flex-col items-center relative z-10">
-                        <!-- Circle Indicator -->
-                        <div class="h-12 w-12 rounded-2xl flex items-center justify-center transition-all duration-500
-                            {{ $currentIdx > $idx || ($demande->statut == 'validee' && $idx == 5) ? 'bg-ci-green text-white shadow-lg shadow-green-200' : 
-                               ($currentIdx == $idx && !$isFailed ? 'bg-ci-orange text-white scale-110 shadow-lg shadow-orange-200 rotate-12' : 
-                               ($isFailed && $currentIdx == $idx ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-50 text-gray-300')) }}">
-                            @if($currentIdx > $idx || ($demande->statut == 'validee' && $idx == 5))
-                                <i class="fa-solid fa-check text-sm"></i>
-                            @else
-                                <i class="fa-solid {{ $step['icon'] }} text-xs"></i>
-                            @endif
-                        </div>
-                        
+                    <div class="flex-1 flex flex-col items-center relative z-10 w-0">
                         <!-- Connecting Line (Next segment) -->
                         @if($idx < 5)
-                            <div class="absolute top-6 left-[3rem] w-[calc(100%-1rem)] h-1 rounded-full overflow-hidden bg-gray-50 -z-10" style="width: calc({{ 100 / count($steps) }}vw - 5rem)">
+                            <div class="absolute top-[17px] left-1/2 w-full h-[3px] bg-gray-100 -z-10 rounded-r-full overflow-hidden">
                                 <div class="h-full bg-ci-green transition-all duration-1000" style="width: {{ $currentIdx > $idx ? '100' : '0' }}%"></div>
                             </div>
                         @endif
 
-                        <div class="mt-4 text-center">
-                            <p class="text-[9px] font-black uppercase tracking-[0.2em] {{ $currentIdx >= $idx ? 'text-gray-900' : 'text-gray-300' }}">{{ $step['label'] }}</p>
-                            <p class="text-[8px] font-bold text-gray-400 uppercase mt-1">{{ $step['role'] }}</p>
+                        <!-- Circle Indicator -->
+                        <div class="h-[34px] w-[34px] rounded-xl flex items-center justify-center transition-all duration-500 ring-4 ring-white
+                            {{ $currentIdx > $idx || ($demande->statut == 'validee' && $idx == 5) ? 'bg-ci-green text-white shadow-sm shadow-green-200' : 
+                               ($currentIdx == $idx && !$isFailed ? 'bg-ci-orange text-white scale-[1.15] shadow-md shadow-orange-200 rotate-6' : 
+                               ($isFailed && $currentIdx == $idx ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-50 text-gray-300')) }}">
+                            @if($currentIdx > $idx || ($demande->statut == 'validee' && $idx == 5))
+                                <i class="fa-solid fa-check text-[10px] sm:text-xs"></i>
+                            @else
+                                <i class="fa-solid {{ $step['icon'] }} text-[10px] sm:text-xs"></i>
+                            @endif
+                        </div>
+                        
+                        <div class="mt-2 sm:mt-3 text-center w-full px-1">
+                            <p class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest {{ $currentIdx >= $idx ? 'text-gray-900' : 'text-gray-400' }} truncate">{{ $step['label'] }}</p>
+                            <p class="text-[7.5px] sm:text-[8px] font-bold text-gray-400/80 uppercase mt-0.5 truncate">{{ $step['role'] }}</p>
                         </div>
                     </div>
                 @endforeach
@@ -142,7 +141,7 @@
         <!-- Right: Actions & Décisions -->
         <div class="space-y-8">
             <!-- Context Box (Sober Design) -->
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 relative overflow-hidden transition-all hover:shadow-lg">
+            <div class="bg-white p-5 sm:p-6 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 relative overflow-hidden hover:shadow-lg">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-full blur-3xl -mr-16 -mt-16"></div>
                 <h4 class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                     <span class="h-1 w-3 bg-ci-green rounded-full"></span> 
@@ -258,58 +257,71 @@
 
                 {{-- Section Validation SDGRTE (Version Compacte) --}}
                 @if($canValidate && $user->isSDGRTE())
-                    <div x-data="{ choix: 'valide_sedmi', rejet: false }" class="mt-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                    <div x-data="{ choix: 'valide_sedmi', rejet: false, submitting: false }" class="mt-2 relative">
+                        <!-- Affichage des erreurs de validation -->
+                        @if ($errors->any())
+                            <div class="mb-4 p-4 bg-red-50 border border-red-100 rounded-2xl">
+                                <ul class="list-disc list-inside text-[10px] font-bold text-red-600 uppercase tracking-widest">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
-                            <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">Arbitrage SDGRTE</h4>
+                            <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">Mes Validations</h4>
                             <i class="fa-solid fa-microchip text-gray-300 text-sm"></i>
                         </div>
 
                         {{-- Proposition SEDMI --}}
                         @if($demande->materiel_propose)
-                            <div class="mb-3 p-3 bg-white rounded-xl border border-gray-100 flex items-center justify-between">
+                            <div class="mb-3 p-3 rounded-xl border transition-all flex items-center justify-between"
+                                 :class="choix === 'contre_propose' ? 'bg-gray-50/50 border-gray-200' : 'bg-white border-ci-green/30 shadow-sm'">
                                 <div>
-                                    <p class="text-[7px] font-black text-ci-orange uppercase tracking-widest mb-0.5">Offre SEDMI</p>
-                                    <p class="text-[11px] font-bold text-gray-900 leading-tight">{{ $demande->materiel_propose }}</p>
+                                    <p class="text-[7px] font-black uppercase tracking-widest mb-0.5 transition-colors"
+                                       :class="choix === 'contre_propose' ? 'text-gray-400' : 'text-ci-green'">Offre SEDMI</p>
+                                    <p class="text-[11px] font-bold leading-tight transition-all"
+                                       :class="choix === 'contre_propose' ? 'text-gray-400 line-through' : 'text-gray-900'">{{ $demande->materiel_propose }}</p>
                                 </div>
-                                <i class="fa-solid fa-laptop-code text-gray-100 italic"></i>
+                                <button type="button" 
+                                        @click="choix = (choix === 'valide_sedmi' ? 'contre_propose' : 'valide_sedmi')"
+                                        class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all focus:outline-none"
+                                        :class="choix === 'contre_propose' ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-orange-50 text-ci-orange hover:bg-orange-100'">
+                                    <i class="fa-solid fa-pen mr-1" x-show="choix === 'valide_sedmi'"></i>
+                                    <i class="fa-solid fa-times mr-1" x-show="choix === 'contre_propose'"></i>
+                                    <span x-text="choix === 'contre_propose' ? 'Annuler' : 'Modifier'"></span>
+                                </button>
                             </div>
                         @endif
 
-                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-3">
+                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-3" @submit="submitting = true">
                             @csrf
                             <input type="hidden" name="decision" value="OK">
                             <input type="hidden" name="decision_sdgrte" :value="choix">
 
-                            <div class="grid grid-cols-2 gap-2">
-                                <label class="flex items-center gap-2 p-2.5 rounded-xl cursor-pointer border transition-all"
-                                       :class="choix === 'valide_sedmi' ? 'bg-white border-ci-green/30 shadow-sm' : 'bg-white/50 border-gray-100'">
-                                    <input type="radio" x-model="choix" value="valide_sedmi" class="hidden">
-                                    <div class="h-3 w-3 rounded-full border-2" :class="choix === 'valide_sedmi' ? 'border-ci-green bg-ci-green' : 'border-gray-200'"></div>
-                                    <span class="text-[9px] font-black text-gray-700 uppercase">Valider</span>
-                                </label>
-                                <label class="flex items-center gap-2 p-2.5 rounded-xl cursor-pointer border transition-all"
-                                       :class="choix === 'contre_propose' ? 'bg-orange-50 border-ci-orange/30 shadow-sm' : 'bg-white/50 border-gray-100'">
-                                    <input type="radio" x-model="choix" value="contre_propose" class="hidden">
-                                    <div class="h-3 w-3 rounded-full border-2" :class="choix === 'contre_propose' ? 'border-ci-orange bg-ci-orange' : 'border-gray-200'"></div>
-                                    <span class="text-[9px] font-black text-gray-700 uppercase">Ajuster</span>
-                                </label>
-                            </div>
-
                             <div x-show="choix === 'contre_propose'" x-collapse class="space-y-2 pt-1">
-                                <select name="materiel_contre_propose" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-bold outline-none">
+                                <select name="materiel_contre_propose" :required="choix === 'contre_propose'" 
+                                        class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-ci-orange/30 focus:border-ci-orange transition-all">
                                     <option value="">Catalogue {{ $demande->categorie_demandee }}</option>
                                     @foreach($materielsCategorie as $mat)
                                         <option value="{{ $mat->marque }} {{ $mat->modele }}">{{ $mat->marque }} {{ $mat->modele }}</option>
                                     @endforeach
                                 </select>
-                                <textarea name="justification_sdgrte" rows="1" placeholder="Justification*" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-bold outline-none h-12"></textarea>
+                                <textarea name="justification_sdgrte" rows="1" :required="choix === 'contre_propose'" 
+                                          placeholder="Justification*" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-ci-orange/30 focus:border-ci-orange transition-all h-12"></textarea>
                             </div>
 
-                            <textarea name="commentaire" rows="1" placeholder="Note finale (Optionnelle)" class="w-full px-3 py-2 bg-white border border-gray-100 rounded-xl text-[10px] font-bold outline-none h-10 resize-none"></textarea>
+                            <input type="text" name="commentaire" placeholder="Note finale ou instructions (Optionnel)" class="w-full px-3 py-3 bg-white border border-gray-100 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-ci-green/30 focus:border-ci-green transition-all">
 
                             <div class="flex gap-2">
-                                <button type="submit" class="flex-[3] py-3.5 bg-ci-green text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg shadow-green-900/10 active:scale-95 transition-all">Transmettre au DSI</button>
-                                <button type="button" @click="rejet = true" class="flex-1 py-3.5 bg-gray-100 text-gray-400 rounded-xl font-black text-[9px] uppercase hover:bg-red-50 hover:text-red-500 transition-all">Rejet</button>
+                                <button type="submit" 
+                                        :disabled="submitting"
+                                        class="flex-[3] py-3.5 bg-ci-green text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg shadow-green-900/10 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span x-show="!submitting">Transmettre au DSI</span>
+                                    <span x-show="submitting"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Transmission...</span>
+                                </button>
+                                <button type="button" @click="rejet = true" :disabled="submitting"
+                                        class="flex-1 py-3.5 bg-gray-100 text-gray-400 rounded-xl font-black text-[9px] uppercase hover:bg-red-50 hover:text-red-500 transition-all disabled:opacity-50">Rejet</button>
                             </div>
                         </form>
 
@@ -336,60 +348,82 @@
 
                 {{-- ═══ FORMULAIRE DSI (Version Compacte) ═══ --}}
                 @if($canValidate && $user->isDSI())
-                    <div x-data="{ choixDsi: 'retient_sedmi', rejet: false }" class="mt-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                    <div x-data="{ choixDsi: 'valide_proposition', rejet: false, submitting: false }" class="mt-2 relative overflow-hidden">
+                        <!-- Affichage des erreurs de validation -->
+                        @if ($errors->any())
+                            <div class="mb-4 p-4 bg-red-50 border border-red-100 rounded-2xl">
+                                <ul class="list-disc list-inside text-[10px] font-bold text-red-600 uppercase tracking-widest">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
-                            <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">Arbitrage Final DSI</h4>
+                            <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">Mes Validations</h4>
                             <i class="fa-solid fa-gavel text-gray-100 text-lg"></i>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2 mb-3">
-                            <div class="p-2.5 bg-gray-50 rounded-xl border border-gray-100">
-                                <p class="text-[6px] font-black text-ci-orange uppercase tracking-widest mb-0.5">Option A (Gestionnaire)</p>
-                                <p class="text-[10px] font-bold text-gray-900 truncate">{{ $demande->materiel_propose ?? '—' }}</p>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col justify-center">
+                                <p class="text-[9px] font-black text-ci-orange uppercase tracking-widest mb-1">Option A (Gestionnaire)</p>
+                                <p class="text-xs sm:text-sm font-bold text-gray-900 leading-tight">{{ $demande->materiel_propose ?? '—' }}</p>
                             </div>
                             @if($demande->hasContreProposition())
-                                <div class="p-2.5 bg-orange-50 rounded-xl border border-ci-orange/10">
-                                    <p class="text-[6px] font-black text-ci-orange uppercase tracking-widest mb-0.5">Option B (SDGRTE)</p>
-                                    <p class="text-[10px] font-bold text-gray-900 truncate">{{ $demande->materiel_contre_propose }}</p>
+                                <div class="p-4 bg-orange-50 rounded-2xl border border-ci-orange/10 flex flex-col justify-center">
+                                    <p class="text-[9px] font-black text-ci-orange uppercase tracking-widest mb-1">Option B (SDGRTE)</p>
+                                    <p class="text-xs sm:text-sm font-bold text-gray-900 leading-tight">{{ $demande->materiel_contre_propose }}</p>
                                 </div>
                             @else
-                                <div class="px-2.5 flex items-center justify-center bg-gray-50/30 border border-dashed border-gray-100 rounded-xl">
-                                    <p class="text-[7px] text-gray-300 font-bold uppercase">Consensus</p>
+                                <div class="p-4 bg-ci-green/5 rounded-2xl border border-ci-green/20 flex flex-col justify-center">
+                                    <p class="text-[9px] font-black text-ci-green uppercase tracking-widest mb-1">Validation SDGRTE</p>
+                                    <p class="text-xs sm:text-sm font-bold text-gray-700 leading-tight">Le SDGRTE a validé l'offre du gestionnaire.</p>
                                 </div>
                             @endif
                         </div>
 
-                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-3">
+                        <form action="{{ route('validations.store', $demande) }}" method="POST" class="space-y-3" @submit="submitting = true">
                             @csrf
                             <input type="hidden" name="decision" value="OK">
+                            <!-- Par défaut, on retient s'il y a une contre prop, sinon la prop sedmi -->
                             <input type="hidden" name="decision_dsi" :value="choixDsi">
 
-                            <div class="grid grid-cols-3 gap-2">
-                                <label @click="choixDsi = 'retient_sedmi'" class="p-2.5 border rounded-xl cursor-pointer text-center transition-all"
-                                       :class="choixDsi === 'retient_sedmi' ? 'bg-ci-green/5 border-ci-green/30' : 'bg-white border-gray-100'">
-                                    <span class="text-[9px] font-black uppercase">Plan A</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl cursor-pointer border transition-all"
+                                       :class="choixDsi === 'valide_proposition' ? 'bg-white border-ci-green/30 shadow-sm' : 'bg-white/50 border-gray-100'">
+                                    <input type="radio" x-model="choixDsi" value="valide_proposition" class="hidden">
+                                    <div class="h-3 w-3 rounded-full border-2" :class="choixDsi === 'valide_proposition' ? 'border-ci-green bg-ci-green' : 'border-gray-200'"></div>
+                                    <span class="text-[9px] font-black text-gray-700 uppercase">Valider</span>
                                 </label>
-                                @if($demande->hasContreProposition())
-                                    <label @click="choixDsi = 'retient_sdgrte'" class="p-2.5 border rounded-xl cursor-pointer text-center transition-all"
-                                           :class="choixDsi === 'retient_sdgrte' ? 'bg-ci-orange/5 border-ci-orange/30' : 'bg-white border-gray-100'">
-                                        <span class="text-[9px] font-black uppercase">Plan B</span>
-                                    </label>
-                                @endif
-                                <label @click="choixDsi = 'autre'" class="p-2.5 border rounded-xl cursor-pointer text-center transition-all"
-                                       :class="choixDsi === 'autre' ? 'bg-purple-50 border-purple-200' : 'bg-white border-gray-100'">
-                                    <i class="fa-solid fa-pen-nib text-[9px]"></i>
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl cursor-pointer border transition-all"
+                                       :class="choixDsi === 'autre' ? 'bg-orange-50 border-ci-orange/30 shadow-sm' : 'bg-white/50 border-gray-100'">
+                                    <input type="radio" x-model="choixDsi" value="autre" class="hidden">
+                                    <div class="h-3 w-3 rounded-full border-2" :class="choixDsi === 'autre' ? 'border-ci-orange bg-ci-orange' : 'border-gray-200'"></div>
+                                    <span class="text-[9px] font-black text-gray-700 uppercase">Ajuster</span>
                                 </label>
                             </div>
 
-                            <div x-show="choixDsi === 'autre'" x-collapse>
-                                <input type="text" name="materiel_retenu_dsi" placeholder="Désignation précise*" class="w-full px-3 py-2 bg-gray-50 border border-purple-100 rounded-xl text-[10px] font-bold outline-none">
+                            <div x-show="choixDsi === 'autre'" x-collapse class="space-y-2 pt-1">
+                                <select name="materiel_retenu_dsi" :required="choixDsi === 'autre'" 
+                                        class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-ci-orange/30 focus:border-ci-orange transition-all">
+                                    <option value="">Catalogue {{ $demande->categorie_demandee }}</option>
+                                    @foreach($materielsCategorie as $mat)
+                                        <option value="{{ $mat->marque }} {{ $mat->modele }}">{{ $mat->marque }} {{ $mat->modele }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
-                            <textarea name="commentaire_dsi" rows="1" placeholder="Instructions (Optionnel)" class="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-bold outline-none h-12"></textarea>
+                            <input type="text" name="commentaire_dsi" placeholder="Instructions finales (Optionnel)" class="w-full px-3 py-3 bg-white border border-gray-100 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-ci-green/30 focus:border-ci-green transition-all">
 
                             <div class="flex gap-2">
-                                <button type="submit" class="flex-[3] py-4 bg-ci-green-dark text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-xl shadow-green-900/10 active:scale-95 transition-all">Valider l'Arbitrage</button>
-                                <button type="button" @click="rejet = true" class="flex-1 py-4 bg-gray-100 text-gray-400 rounded-xl font-black text-[9px] uppercase hover:text-red-500 transition-all">Annuler</button>
+                                <button type="submit" 
+                                        :disabled="submitting"
+                                        class="flex-[3] py-3.5 bg-ci-green-dark text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-xl shadow-green-900/10 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span x-show="!submitting">Signer et Clôturer</span>
+                                    <span x-show="submitting"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Signature...</span>
+                                </button>
+                                <button type="button" @click="rejet = true" :disabled="submitting"
+                                        class="flex-1 py-3.5 bg-gray-100 text-gray-400 rounded-xl font-black text-[9px] uppercase hover:bg-red-50 hover:text-red-500 transition-all disabled:opacity-50">Annuler</button>
                             </div>
                         </form>
 

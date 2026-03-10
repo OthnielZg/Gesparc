@@ -43,10 +43,10 @@
                     icon="fa-check-double">
                     @php
                         $label = match (Auth::user()->role) {
-                            'DR' => 'Validation DR',
+                            'DR' => 'Mes Validations',
                             'gestionnaire' => 'Dotation Matériel',
-                            'SDGRTE' => 'Validation SDGRTE',
-                            'DSI' => 'Validation Finale DSI',
+                            'SDGRTE' => 'Mes Validations',
+                            'DSI' => 'Mes Validations',
                             default => 'Mes Validations'
                         };
                     @endphp
