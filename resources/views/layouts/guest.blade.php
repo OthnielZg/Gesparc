@@ -29,6 +29,23 @@
             .text-ci-green { color: #009E60; }
             .text-ci-orange { color: #F77F00; }
             .border-ci-green { border-color: #009E60; }
+
+            /* Suppression du focus bleu et application du orange theme */
+            input:focus, select:focus, textarea:focus {
+                outline: none !important;
+                box-shadow: none !important;
+                border-color: #F77F00 !important;
+                --tw-ring-width: 0px !important;
+                ring: 0 !important;
+            }
+
+            /* Fix Tailwind Forms duplicate chevron */
+            select {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background-image: none !important;
+            }
         </style>
     </head>
     <body class="font-sans text-gray-900 antialiased min-h-screen bg-white">

@@ -54,7 +54,6 @@ class Demande extends Model
             'validee' => 'Validée',
             'rejetee' => 'Rejetée',
             'annulee' => 'Annulée',
-            'en_commande' => 'En commande',
         ];
     }
 
@@ -88,13 +87,34 @@ class Demande extends Model
             'validee' => 'green',
             'rejetee' => 'red',
             'annulee' => 'gray',
-            'en_commande' => 'yellow',
         ];
     }
 
     public function getStatutLabelAttribute(): string
     {
         return self::statutLabel()[$this->statut] ?? $this->statut;
+    }
+
+    public static function statutColorHex(): array
+    {
+        return [
+            'pre_demande' => '#3b82f6', // blue-500
+            'en_attente_dr' => '#eab308', // yellow-500
+            'transmise_gestionnaire' => '#f97316', // orange-500 (DGI)
+            'proposition_sdgrte' => '#a855f7', // purple-500
+            'en_attente_dsi' => '#6366f1', // indigo-500
+            'validee_dsi' => '#14b8a6', // teal-500
+            'en_finalisation' => '#06b6d4', // cyan-500
+            'finalisee' => '#22c55e', // green-500 (CI)
+            'validee' => '#22c55e',
+            'rejetee' => '#ef4444', // red-500
+            'annulee' => '#64748b', // slate-500
+        ];
+    }
+
+    public function getStatutColorHexAttribute(): string
+    {
+        return self::statutColorHex()[$this->statut] ?? '#94a3b8';
     }
 
     public function getStatutColorAttribute(): string

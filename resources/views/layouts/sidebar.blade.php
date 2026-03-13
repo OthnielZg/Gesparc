@@ -11,16 +11,21 @@
         <x-nav-link :href="route('demandes.index')" :active="request()->routeIs('demandes.index')" icon="fa-file-invoice">
             {{ Auth::user()->hasRole('agent') ? 'Mes Demandes' : 'Suivi des Dossiers' }}
         </x-nav-link>
-        @if(Auth::user()->hasRole(['agent', 'chef_cdi', 'DR']))
-            <x-nav-link :href="route('mon-materiel.index')" :active="request()->routeIs('mon-materiel.*')" icon="fa-laptop">
-                @php
-                    echo match (Auth::user()->role) {
-                        'agent' => 'Mon Matériel',
-                        'chef_cdi' => 'Matériels de mon Service',
-                        'DR' => 'Parc de ma Direction',
-                        default => 'Mon Matériel',
-                    };
-                @endphp
+        @unless(Auth::user()->hasRole(['admin', 'gestionnaire']))
+            <x-nav-link :href="route('mon-materiel.index')" :active="request()->routeIs('mon-materiel.index')" icon="fa-laptop">
+                Mon Matériel
+            </x-nav-link>
+        @endunless
+
+        @if(Auth::user()->hasRole('chef_cdi'))
+            <x-nav-link :href="route('mon-materiel.service')" :active="request()->routeIs('mon-materiel.service')" icon="fa-users-gear">
+                Mon Service
+            </x-nav-link>
+        @endif
+
+        @if(Auth::user()->hasRole('DR'))
+            <x-nav-link :href="route('mon-materiel.direction')" :active="request()->routeIs('mon-materiel.direction')" icon="fa-city">
+                Ma Direction
             </x-nav-link>
         @endif
 

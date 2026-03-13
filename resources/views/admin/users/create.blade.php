@@ -1,6 +1,31 @@
 <x-app-layout>
     <div x-data="{ 
         role: '{{ old('role', 'agent') }}',
+        villes: {{ $villes->map(fn($v) => ['id' => $v->id, 'nom' => $v->nom_ville])->toJson() }},
+        allDirections: {{ $directions->map(fn($d) => ['id' => $d->id, 'nom' => $d->nom_direction, 'id_ville' => $d->id_ville])->toJson() }},
+        allServices: {{ $services->map(fn($s) => ['id' => $s->id, 'nom' => $s->nom_service, 'id_direction' => $s->id_direction])->toJson() }},
+        allBureaux: {{ $bureaux->map(fn($b) => ['id' => $b->id, 'nom' => $b->nom_bureau, 'id_service' => $b->id_service])->toJson() }},
+        
+        selectedVille: '{{ old('id_ville', '') }}',
+        selectedDirection: '{{ old('id_direction', '') }}',
+        selectedService: '{{ old('id_service', '') }}',
+        selectedBureau: '{{ old('id_bureau', '') }}',
+
+        get filteredDirections() {
+            return this.allDirections.filter(d => d.id_ville == this.selectedVille);
+        },
+        get filteredServices() {
+            return this.allServices.filter(s => s.id_direction == this.selectedDirection);
+        },
+        get filteredBureaux() {
+            return this.allBureaux.filter(b => b.id_service == this.selectedService);
+        },
+
+        resetBelow(level) {
+            if (level <= 1) { this.selectedDirection = ''; }
+            if (level <= 2) { this.selectedService = ''; }
+            if (level <= 3) { this.selectedBureau = ''; }
+        }
     }" class="space-y-6 pt-1 pb-6 px-4">
 
         <!-- Header -->
@@ -71,7 +96,7 @@
                             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Rôle Système <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <select name="role" x-model="role" required
-                                    class="w-full bg-gray-50/50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none appearance-none cursor-pointer">
+                                    class="w-full bg-gray-50/50 border-2 border-transparent focus:border-ci-orange focus:bg-white rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none appearance-none cursor-pointer">
                                     @foreach(\App\Models\User::roles() as $value => $label)
                                         <option value="{{ $value }}">{{ $label }}</option>
                                     @endforeach
@@ -80,26 +105,75 @@
                             </div>
                         </div>
 
-                        <div class="space-y-2">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Bureau d'Affectation</label>
-                            <div class="relative">
-                                <select name="id_bureau" 
-                                    class="w-full bg-gray-50/50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none appearance-none cursor-pointer">
-                                    <option value="">(AUCUNE AFFECTATION)</option>
-                                    @foreach($bureaux as $bureau)
-                                        <option value="{{ $bureau->id }}" {{ old('id_bureau') == $bureau->id ? 'selected' : '' }}>
-                                            {{ $bureau->nom_bureau }} ({{ $bureau->service->nom_service ?? 'DGI' }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300"><i class="fa-solid fa-chevron-down text-xs"></i></div>
+                        <!-- Affichage Hiérarchique Cascade -->
+                        <template x-if="role !== 'admin' && role !== 'gestionnaire'">
+                            <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 bg-slate-50/50 p-6 rounded-[1.5rem] border border-slate-100">
+                                <!-- Ville -->
+                                <div class="space-y-2">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Ville <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <select x-model="selectedVille" @change="resetBelow(1)"
+                                            class="w-full bg-white border-2 border-transparent focus:border-ci-orange rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none appearance-none cursor-pointer shadow-sm">
+                                            <option value="">Sélectionnez une ville</option>
+                                            <template x-for="v in villes" :key="v.id">
+                                                <option :value="v.id" x-text="v.nom"></option>
+                                            </template>
+                                        </select>
+                                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300"><i class="fa-solid fa-chevron-down text-[10px]"></i></div>
+                                    </div>
+                                </div>
+
+                                <!-- Direction -->
+                                <div class="space-y-2">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Direction <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <select name="id_direction" x-model="selectedDirection" @change="resetBelow(2)" :disabled="!selectedVille"
+                                            class="w-full bg-white border-2 border-transparent focus:border-ci-orange rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none appearance-none cursor-pointer shadow-sm disabled:opacity-50">
+                                            <option value="">Sélectionnez une direction</option>
+                                            <template x-for="d in filteredDirections" :key="d.id">
+                                                <option :value="d.id" x-text="d.nom" :selected="d.id == selectedDirection"></option>
+                                            </template>
+                                        </select>
+                                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300"><i class="fa-solid fa-chevron-down text-[10px]"></i></div>
+                                    </div>
+                                </div>
+
+                                <!-- Service -->
+                                <div class="space-y-2">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Service</label>
+                                    <div class="relative">
+                                        <select x-model="selectedService" @change="resetBelow(3)" :disabled="!selectedDirection"
+                                            class="w-full bg-white border-2 border-transparent focus:border-ci-orange rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none appearance-none cursor-pointer shadow-sm disabled:opacity-50">
+                                            <option value="">Sélectionnez un service</option>
+                                            <template x-for="s in filteredServices" :key="s.id">
+                                                <option :value="s.id" x-text="s.nom" :selected="s.id == selectedService"></option>
+                                            </template>
+                                        </select>
+                                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300"><i class="fa-solid fa-chevron-down text-[10px]"></i></div>
+                                    </div>
+                                </div>
+
+                                <!-- Bureau -->
+                                <div class="space-y-2">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Bureau</label>
+                                    <div class="relative">
+                                        <select name="id_bureau" x-model="selectedBureau" :disabled="!selectedService"
+                                            class="w-full bg-white border-2 border-transparent focus:border-ci-orange rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none appearance-none cursor-pointer shadow-sm disabled:opacity-50">
+                                            <option value="">Sélectionnez un bureau</option>
+                                            <template x-for="b in filteredBureaux" :key="b.id">
+                                                <option :value="b.id" x-text="b.nom" :selected="b.id == selectedBureau"></option>
+                                            </template>
+                                        </select>
+                                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300"><i class="fa-solid fa-chevron-down text-[10px]"></i></div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </template>
 
                         <div class="space-y-2">
                             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Email Professionnel <span class="text-red-500">*</span></label>
                             <input type="email" name="email" value="{{ old('email') }}" required
-                                class="w-full bg-gray-50/50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none shadow-sm placeholder:text-gray-300"
+                                class="w-full bg-gray-50/50 border-2 border-transparent focus:border-ci-orange focus:bg-white rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none shadow-sm placeholder:text-gray-300"
                                 placeholder="ex: j.koffi@dgi.gouv.ci">
                             @error('email') <p class="text-[10px] font-black text-red-500 mt-1 ml-1 uppercase tracking-widest">{{ $message }}</p> @enderror
                         </div>
@@ -107,7 +181,7 @@
                         <div class="space-y-2">
                             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Contact / Téléphone</label>
                             <input type="text" name="contact" value="{{ old('contact') }}"
-                                class="w-full bg-gray-50/50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none shadow-sm placeholder:text-gray-300"
+                                class="w-full bg-gray-50/50 border-2 border-transparent focus:border-ci-orange focus:bg-white rounded-xl text-xs px-4 py-3 font-bold transition-all outline-none shadow-sm placeholder:text-gray-300"
                                 placeholder="ex: +225 01 02 03 04 05">
                         </div>
                     </div>

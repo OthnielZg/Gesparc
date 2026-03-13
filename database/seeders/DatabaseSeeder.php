@@ -63,6 +63,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'chef.cdi@dgi.ci',
             'password' => $password,
             'role' => User::ROLE_CHEF_CDI,
+            'id_bureau' => $bureauSupport1->id, // Maintenant rattaché pour le workflow
             'actif' => true,
         ]);
 
@@ -73,6 +74,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'dr@dgi.ci',
             'password' => $password,
             'role' => User::ROLE_DR,
+            'id_direction' => $dg->id, // Maintenant rattaché
             'actif' => true,
         ]);
 
@@ -83,6 +85,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'gestionnaire@dgi.ci',
             'password' => $password,
             'role' => User::ROLE_GESTIONNAIRE,
+            'id_direction' => $dsi->id,
             'actif' => true,
         ]);
 
@@ -93,6 +96,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'sdgrte@dgi.ci',
             'password' => $password,
             'role' => User::ROLE_SDGRTE,
+            'id_direction' => $plateau->id, // Ou direction centrale si applicable
             'actif' => true,
         ]);
 
@@ -103,6 +107,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'dsi@dgi.ci',
             'password' => $password,
             'role' => User::ROLE_DSI,
+            'id_direction' => $dsi->id,
             'actif' => true,
         ]);
 

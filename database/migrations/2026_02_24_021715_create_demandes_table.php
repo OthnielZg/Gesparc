@@ -24,7 +24,6 @@ return new class extends Migration
                 'validee',             
                 'rejetee',             
                 'annulee',             
-                'en_commande',         
             ])->default('pre_demande');
             $table->foreignId('id_utilisateur')->constrained('users')->cascadeOnDelete(); 
             $table->foreignId('id_chef_cdi')->nullable()->constrained('users')->nullOnDelete(); 

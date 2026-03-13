@@ -13,83 +13,86 @@ class MonMaterielController extends Controller
     public function index()
     {
         $user = Auth::user();
+        
+        // Tous les rôles qui peuvent faire des demandes voient leur matériel personnel ici
+        $affectations = Affectation::where('id_utilisateur', $user->id)
+            ->with(['materiel', 'demande'])
+            ->latest('date_affectation')
+            ->get();
 
-        if ($user->hasRole('agent')) {
-            $affectations = Affectation::where('id_utilisateur', $user->id)
-                ->with(['materiel', 'demande'])
-                ->latest('date_affectation')
-                ->get();
+        return view('mon_materiel.agent', compact('affectations'));
+    }
 
-            return view('mon_materiel.agent', compact('affectations'));
+    public function service()
+    {
+        $user = Auth::user();
+        if (!$user->hasRole('chef_cdi')) {
+            return redirect()->route('mon-materiel.index');
         }
 
-        if ($user->hasRole('chef_cdi')) {
-            $service = $user->bureau?->service;
+        $service = $user->bureau?->service;
+        if (!$service) {
+            return view('mon_materiel.chef', [
+                'service' => null,
+                'affectations' => collect(),
+                'membres' => collect(),
+            ]);
+        }
 
-            if (! $service) {
-                return view('mon_materiel.chef', [
-                    'service' => null,
-                    'affectations' => collect(),
-                    'membres' => collect(),
-                ]);
-            }
+        $userIds = User::whereHas('bureau', fn ($q) => $q->where('id_service', $service->id))
+            ->pluck('id');
 
-            $userIds = User::whereHas('bureau', fn ($q) => $q->where('id_service', $service->id))
+        $affectations = Affectation::whereIn('id_utilisateur', $userIds)
+            ->with(['materiel', 'utilisateur.bureau'])
+            ->whereNull('date_retour')
+            ->latest('date_affectation')
+            ->get();
+
+        $membres = User::whereHas('bureau', fn ($q) => $q->where('id_service', $service->id))
+            ->with(['bureau', 'affectations.materiel'])
+            ->get();
+
+        return view('mon_materiel.chef', compact('service', 'affectations', 'membres'));
+    }
+
+    public function direction()
+    {
+        $user = Auth::user();
+        if (!$user->hasRole('DR')) {
+            return redirect()->route('mon-materiel.index');
+        }
+
+        $direction = $user->direction;
+        if (!$direction) {
+            $direction = Direction::with(['services.bureaux.utilisateurs'])->first();
+        }
+
+        $services = Service::where('id_direction', $direction->id)
+            ->with(['bureaux.utilisateurs.affectations.materiel'])
+            ->get();
+
+        $servicesStats = $services->map(function ($service) {
+            $userIds = $service->bureaux
+                ->flatMap(fn ($b) => $b->utilisateurs)
                 ->pluck('id');
 
-            $affectations = Affectation::whereIn('id_utilisateur', $userIds)
-                ->with(['materiel', 'utilisateur.bureau'])
+            $totalMateriels = Affectation::whereIn('id_utilisateur', $userIds)
                 ->whereNull('date_retour')
-                ->latest('date_affectation')
-                ->get();
+                ->count();
 
-            $membres = User::whereHas('bureau', fn ($q) => $q->where('id_service', $service->id))
-                ->with(['bureau', 'affectations.materiel'])
-                ->get();
+            $agentsCount = $userIds->count();
 
-            return view('mon_materiel.chef', compact('service', 'affectations', 'membres'));
-        }
+            return [
+                'service' => $service,
+                'totalMateriels' => $totalMateriels,
+                'agentsCount' => $agentsCount,
+                'bureauxCount' => $service->bureaux->count(),
+                'userIds' => $userIds,
+            ];
+        });
 
-        if ($user->hasRole('DR')) {
-            // DR sees all services stats in their direction
-            $direction = $user->direction;
+        $grandTotal = $servicesStats->sum('totalMateriels');
 
-            if (! $direction) {
-                // Fallback: show all directions
-                $direction = Direction::with(['services.bureaux.utilisateurs'])->first();
-            }
-
-            // Load services with their bureaux, users and affectations
-            $services = Service::where('id_direction', $direction->id)
-                ->with(['bureaux.utilisateurs.affectations.materiel'])
-                ->get();
-
-            // Build stats per service
-            $servicesStats = $services->map(function ($service) {
-                $userIds = $service->bureaux
-                    ->flatMap(fn ($b) => $b->utilisateurs)
-                    ->pluck('id');
-
-                $totalMateriels = Affectation::whereIn('id_utilisateur', $userIds)
-                    ->whereNull('date_retour')
-                    ->count();
-
-                $agentsCount = $userIds->count();
-
-                return [
-                    'service' => $service,
-                    'totalMateriels' => $totalMateriels,
-                    'agentsCount' => $agentsCount,
-                    'bureauxCount' => $service->bureaux->count(),
-                    'userIds' => $userIds,
-                ];
-            });
-
-            $grandTotal = $servicesStats->sum('totalMateriels');
-
-            return view('mon_materiel.directeur', compact('direction', 'servicesStats', 'grandTotal'));
-        }
-
-        return redirect()->route('dashboard')->with('error', 'Accès non autorisé.');
+        return view('mon_materiel.directeur', compact('direction', 'servicesStats', 'grandTotal'));
     }
 }

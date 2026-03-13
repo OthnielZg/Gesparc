@@ -15,6 +15,41 @@
             @endunless
         </div>
     </x-slot>
+    
+    <!-- Filters & Search -->
+    <div class="bg-white p-2 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-gray-100 mb-8 p-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-gray-50/50 rounded-full -translate-y-16 translate-x-16 pointer-events-none"></div>
+        <form action="{{ route('demandes.index') }}" method="GET" class="flex flex-col md:flex-row gap-6 items-end relative z-10">
+            <div class="flex-1 w-full">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Rechercher un dossier</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-gray-300">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </span>
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           class="block w-full pl-12 pr-6 py-4 bg-gray-50/50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-2xl transition-all outline-none text-sm font-bold shadow-sm placeholder:text-gray-300"
+                           placeholder="Référence, Matériel, Motif...">
+                </div>
+            </div>
+            <div class="w-full md:w-64">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Filtrer par statut</label>
+                <select name="statut" class="block w-full px-6 py-4 bg-gray-50/50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-2xl transition-all outline-none text-sm font-bold shadow-sm appearance-none cursor-pointer">
+                    <option value="">Tous les dossiers</option>
+                    @foreach(\App\Models\Demande::statutLabel() as $key => $label)
+                        <option value="{{ $key }}" {{ request('statut') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="h-[56px] px-10 bg-ci-green-dark text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-black/10">
+                Filtrer
+            </button>
+            @if(request()->hasAny(['search', 'statut']))
+                <a href="{{ route('demandes.index') }}" class="h-[56px] flex items-center px-4 text-gray-400 hover:text-red-500 font-black text-[10px] uppercase tracking-widest transition-colors mb-1">
+                    <i class="fa-solid fa-rotate-left mr-2"></i> Reset
+                </a>
+            @endif
+        </form>
+    </div>
 
     <!-- Table -->
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">

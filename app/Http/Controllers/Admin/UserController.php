@@ -20,9 +20,12 @@ class UserController extends Controller
 
     public function create()
     {
-        $bureaux = Bureau::with('service.direction.ville')->get();
+        $villes = \App\Models\Ville::all();
+        $directions = \App\Models\Direction::all();
+        $services = \App\Models\Service::all();
+        $bureaux = \App\Models\Bureau::all();
 
-        return view('admin.users.create', compact('bureaux'));
+        return view('admin.users.create', compact('villes', 'directions', 'services', 'bureaux'));
     }
 
     public function store(Request $request)
@@ -34,6 +37,7 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'string'],
             'id_bureau' => ['nullable', 'exists:bureaux,id'],
+            'id_direction' => ['nullable', 'exists:directions,id'],
             'contact' => ['nullable', 'string'],
         ]);
 
@@ -44,6 +48,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'id_bureau' => $request->id_bureau,
+            'id_direction' => $request->id_direction,
             'contact' => $request->contact,
             'actif' => true,
         ]);
@@ -53,9 +58,12 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $bureaux = Bureau::with('service.direction.ville')->get();
+        $villes = \App\Models\Ville::all();
+        $directions = \App\Models\Direction::all();
+        $services = \App\Models\Service::all();
+        $bureaux = \App\Models\Bureau::all();
 
-        return view('admin.users.edit', compact('user', 'bureaux'));
+        return view('admin.users.edit', compact('user', 'villes', 'directions', 'services', 'bureaux'));
     }
 
     public function update(Request $request, User $user)
@@ -66,10 +74,11 @@ class UserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'role' => ['required', 'string'],
             'id_bureau' => ['nullable', 'exists:bureaux,id'],
+            'id_direction' => ['nullable', 'exists:directions,id'],
             'contact' => ['nullable', 'string'],
         ]);
 
-        $user->update($request->only('prenom', 'nom', 'email', 'role', 'id_bureau', 'contact'));
+        $user->update($request->only('prenom', 'nom', 'email', 'role', 'id_bureau', 'id_direction', 'contact'));
 
         if ($request->filled('password')) {
             $request->validate(['password' => ['confirmed', Rules\Password::defaults()]]);

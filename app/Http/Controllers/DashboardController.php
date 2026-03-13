@@ -54,12 +54,108 @@ class DashboardController extends Controller
                 $stats['demandes_a_valider'] = $this->getPendingValidationsCount($user);
             }
 
+            if ($user->role === 'DR') {
+                $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
+                if ($directionId) {
+                    $stats['total_services'] = \App\Models\Service::where('id_direction', $directionId)->count();
+                }
+            }
+
             if ($user->hasRole(['admin'])) {
                 $stats['total_users'] = User::count();
+                $stats['users_actifs'] = User::where('actif', true)->count();
+                $stats['users_bloques'] = User::where('actif', false)->count();
+                $stats['total_villes'] = \App\Models\Ville::count();
+                $stats['total_directions'] = \App\Models\Direction::count();
+                $stats['total_services'] = \App\Models\Service::count();
             }
         }
 
-        return view('dashboard', compact('stats'));
+        // --- Données pour les Graphiques (Filtrées par Rôle) ---
+        
+        $statutQuery = Demande::query();
+        $stockQuery = Materiel::query();
+        $userRoleData = collect([]);
+        $userStructureData = collect([]);
+
+        if ($user->hasRole('admin')) {
+            // Graphique 1: Utilisateurs par Rôle
+            $userRoleData = User::select('role', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                ->groupBy('role')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'label' => User::roleLabels()[$item->role] ?? $item->role,
+                        'total' => $item->total
+                    ];
+                });
+
+            // Graphique 2: Utilisateurs par Direction
+            $userStructureData = User::join('directions', 'users.id_direction', '=', 'directions.id')
+                ->select('directions.nom_direction', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                ->groupBy('directions.nom_direction')
+                ->get();
+            
+            // Si pas assez de données par direction, essayer par service via bureau
+            if ($userStructureData->isEmpty()) {
+                $userStructureData = User::join('bureaux', 'users.id_bureau', '=', 'bureaux.id')
+                    ->join('services', 'bureaux.id_service', '=', 'services.id')
+                    ->select('services.nom_service as label', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                    ->groupBy('services.nom_service')
+                    ->get();
+            }
+        }
+
+        if ($user->role === 'agent') {
+            $statutQuery->where('id_utilisateur', $user->id);
+            // Pour l'agent, le stock n'est pas forcément pertinent en détail global, 
+            // mais on peut lui montrer les catégories de ses propres matériels.
+            $stockQuery = \App\Models\Affectation::where('id_utilisateur', $user->id)
+                ->whereNull('date_retour')
+                ->join('materiels', 'affectations.id_materiel', '=', 'materiels.id')
+                ->select('materiels.categorie', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                ->groupBy('materiels.categorie');
+        } elseif ($user->role === 'chef_cdi') {
+            $serviceId = $user->bureau?->id_service;
+            $statutQuery->whereHas('utilisateur.bureau', fn($q) => $q->where('id_service', $serviceId));
+            $stockQuery->whereHas('affectations.utilisateur.bureau', fn($q) => $q->where('id_service', $serviceId));
+        } elseif ($user->role === 'DR') {
+            $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
+            $statutQuery->whereHas('utilisateur.bureau.service', fn($q) => $q->where('id_direction', $directionId));
+            $stockQuery->whereHas('affectations.utilisateur.bureau.service', fn($q) => $q->where('id_direction', $directionId));
+        }
+        // Pour Gestionnaire, SDGRTE, DSI, on garde la vue globale (pas de filtre)
+
+        // 1. Répartition par Statut (Désactivé pour agent)
+        $repartitionStatut = collect([]);
+        if ($user->role !== 'agent') {
+            $repartitionStatut = $statutQuery->select('statut', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                ->groupBy('statut')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'label' => $item->statut_label,
+                        'total' => $item->total,
+                        'color' => $item->statut_color_hex
+                    ];
+                });
+        }
+
+        // 2. Stock par Catégorie (Désactivé pour agent)
+        $stockParCategorie = collect([]);
+        if ($user->role !== 'agent') {
+            $stockParCategorie = $stockQuery->select('categorie', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                ->groupBy('categorie')
+                ->get();
+        }
+
+        return view('dashboard', compact(
+            'stats', 
+            'repartitionStatut', 
+            'stockParCategorie', 
+            'userRoleData', 
+            'userStructureData'
+        ));
     }
 
     private function getPendingValidationsCount($user)
@@ -78,25 +174,19 @@ class DashboardController extends Controller
             $query = Demande::where('statut', $targetStatus);
             
             if ($user->hasRole('DR')) {
-                if ($user->id_direction) {
-                    $idDirection = $user->id_direction;
-                    $query->where(function ($q) use ($user, $idDirection) {
-                        $q->where('id_utilisateur', $user->id)
-                          ->orWhereHas('utilisateur.bureau.service', function ($serviceQuery) use ($idDirection) {
-                              $serviceQuery->where('id_direction', $idDirection);
-                          })
-                          ->orWhereHas('utilisateur', function ($userQuery) use ($idDirection) {
-                              $userQuery->where('id_direction', $idDirection);
-                          });
-                    });
-                } elseif ($user->bureau && $user->bureau->service && $user->bureau->service->id_direction) {
-                    $idDirection = $user->bureau->service->id_direction;
-                    $query->where(function ($q) use ($user, $idDirection) {
-                        $q->where('id_utilisateur', $user->id)
-                          ->orWhereHas('utilisateur.bureau.service', function ($sQuery) use ($idDirection) {
-                              $sQuery->where('id_direction', $idDirection);
-                          });
-                    });
+                $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
+                
+                if ($directionId) {
+                    $direction = \App\Models\Direction::find($directionId);
+                    $idVille = $direction?->id_ville;
+
+                    if ($idVille) {
+                        $query->whereHas('utilisateur.bureau.service.direction', function ($q) use ($idVille) {
+                            $q->where('id_ville', $idVille);
+                        });
+                    } else {
+                        $query->where('id_utilisateur', $user->id);
+                    }
                 } else {
                     $query->where('id_utilisateur', $user->id);
                 }

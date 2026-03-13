@@ -23,6 +23,7 @@ class User extends Authenticatable
         'actif',
         'role',
         'id_bureau',
+        'id_direction',
         'photo_path',
         'photo_url',
     ];

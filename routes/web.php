@@ -27,6 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('validations/{demande}', [ValidationController::class, 'store'])->name('validations.store');
 
     Route::get('mon-materiel', [MonMaterielController::class, 'index'])->name('mon-materiel.index');
+    Route::get('mon-materiel/service', [MonMaterielController::class, 'service'])->name('mon-materiel.service');
+    Route::get('mon-materiel/direction', [MonMaterielController::class, 'direction'])->name('mon-materiel.direction');
 
     Route::get('affectations', [AffectationController::class, 'index'])->name('affectations.index');
     Route::get('affectations/dotations', [AffectationController::class, 'dotations'])->name('affectations.dotations');

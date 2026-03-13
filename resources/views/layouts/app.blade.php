@@ -51,6 +51,31 @@
             .sidebar-scroll:hover::-webkit-scrollbar-thumb:hover {
                 background: rgba(255, 255, 255, 0.25);
             }
+
+            /* Fix doublon flèche select */
+            select {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background-image: none !important;
+            }
+            select::-ms-expand {
+                display: none;
+            }
+
+            /* Suppression du focus bleu et application du orange theme */
+            input:focus, select:focus, textarea:focus {
+                outline: none !important;
+                box-shadow: none !important;
+                border-color: #EE6B12 !important;
+                --tw-ring-width: 0px !important;
+                ring: 0 !important;
+            }
+
+            /* Fix Tailwind Forms duplicate chevron */
+            select {
+                background-image: none !important;
+            }
         </style>
     </head>
     <body class="font-sans antialiased h-full overflow-hidden text-gray-800" x-data="{ sidebarOpen: false, desktopSidebarOpen: true, scrolled: false, showLogoutModal: false }">

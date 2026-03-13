@@ -35,27 +35,21 @@ class ValidationController extends Controller
             ->with(['utilisateur.bureau.service', 'validations.utilisateur']);
 
         if ($user->hasRole('DR')) {
-            if ($user->id_direction) {
-                $idDirection = $user->id_direction;
-                $query->where(function ($q) use ($user, $idDirection) {
-                    $q->where('id_utilisateur', $user->id)
-                      ->orWhereHas('utilisateur.bureau.service', function ($serviceQuery) use ($idDirection) {
-                          $serviceQuery->where('id_direction', $idDirection);
-                      })
-                      ->orWhereHas('utilisateur', function ($userQuery) use ($idDirection) {
-                          $userQuery->where('id_direction', $idDirection);
-                      });
-                });
-            } elseif ($user->bureau && $user->bureau->service && $user->bureau->service->id_direction) {
-                $idDirection = $user->bureau->service->id_direction;
-                $query->where(function ($q) use ($user, $idDirection) {
-                    $q->where('id_utilisateur', $user->id)
-                      ->orWhereHas('utilisateur.bureau.service', function ($sQuery) use ($idDirection) {
-                          $sQuery->where('id_direction', $idDirection);
-                      });
-                });
+            $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
+            
+            if ($directionId) {
+                $direction = \App\Models\Direction::find($directionId);
+                $idVille = $direction?->id_ville;
+
+                if ($idVille) {
+                    $query->whereHas('utilisateur.bureau.service.direction', function ($q) use ($idVille) {
+                        $q->where('id_ville', $idVille);
+                    });
+                } else {
+                    $query->where('id_utilisateur', $user->id); // Fallback
+                }
             } else {
-                $query->where('id_utilisateur', $user->id);
+                $query->where('id_utilisateur', $user->id); // Fallback
             }
         }
 

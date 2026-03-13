@@ -152,12 +152,61 @@
 
                 <!-- Action Chef CDI -->
                 @if($user->hasRole('chef_cdi') && $demande->statut == 'pre_demande')
-                    <form action="{{ route('demandes.officialise', $demande) }}" method="POST" class="mb-4">
-                        @csrf
-                        <button type="submit" class="w-full py-5 bg-ci-green-dark text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-green-900/10 group">
+                    <div class="space-y-4" x-data="{ open: false, decision: 'OK' }">
+                        <button @click="open = true; decision = 'OK'" class="w-full py-5 bg-ci-green-dark text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-green-900/10 group">
                             <i class="fa-solid fa-file-circle-check mr-2 group-hover:rotate-12 transition-transform"></i> Officialiser le besoin
                         </button>
-                    </form>
+                        <button @click="open = true; decision = 'KO'" class="w-full py-4 bg-white border-2 border-gray-100 text-gray-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-red-500/30 hover:text-red-500 transition-all">
+                            Décliner la demande
+                        </button>
+
+                        <!-- Modal Chef CDI -->
+                        <div x-show="open" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4"
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0"
+                             x-transition:enter-end="opacity-100">
+                            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md"></div>
+                            <div class="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl text-gray-900 overflow-hidden flex flex-col"
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 @click.away="open = false">
+                                
+                                <div class="px-8 pt-8 pb-4 flex items-center gap-4 bg-white/50 backdrop-blur-sm border-b border-gray-50">
+                                    <div class="h-12 w-12 rounded-2xl flex items-center justify-center flex-shrink-0" :class="decision == 'OK' ? 'bg-green-50 text-ci-green' : 'bg-red-50 text-red-500'">
+                                        <i class="fa-solid text-xl" :class="decision == 'OK' ? 'fa-file-circle-check' : 'fa-circle-xmark'"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-black tracking-tighter leading-none" x-text="decision == 'OK' ? 'Officialiser' : 'Rejeter' "></h3>
+                                        <p class="text-[9px] font-black uppercase text-gray-400 tracking-[0.2em] mt-1">Chef de Service • Décision</p>
+                                    </div>
+                                </div>
+
+                                <form action="{{ route('demandes.officialise', $demande) }}" method="POST" class="flex flex-col h-full overflow-hidden">
+                                    @csrf
+                                    <input type="hidden" name="decision" :value="decision">
+                                    
+                                    <div class="px-8 py-6 max-h-[60vh] overflow-y-auto space-y-6">
+                                        <div class="space-y-1.5">
+                                            <label class="text-[8px] font-black text-gray-400 uppercase tracking-widest block ml-1">
+                                                Commentaire <span x-show="decision == 'KO'">* (Obligatoire)</span>
+                                            </label>
+                                            <textarea name="commentaire" :required="decision == 'KO'" placeholder="Observations ou motif du rejet..." class="w-full px-4 py-3 bg-gray-50/80 border border-gray-100 focus:border-ci-green focus:bg-white focus:ring-0 rounded-2xl text-[13px] font-bold outline-none h-24 transition-all resize-none text-gray-600"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex gap-4">
+                                        <button type="button" @click="open = false" class="flex-1 py-4 text-gray-400 font-black uppercase tracking-widest text-[10px] hover:text-gray-600 transition-colors">Retour</button>
+                                        <button type="submit" class="flex-[2] py-4 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                                                :class="decision == 'OK' ? 'bg-ci-green-dark shadow-green-900/10' : 'bg-red-600 shadow-red-900/10'">
+                                            <i class="fa-solid fa-signature"></i>
+                                            Signer la décision
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 @endif
 
                 @php
