@@ -24,7 +24,7 @@
                         <input type="email" name="email" value="{{ old('email', $fournisseur->email) }}" class="block w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-xl transition-all outline-none text-sm font-bold shadow-sm">
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px) font-black text-gray-400 uppercase tracking-widest ml-1 block">Téléphone</label>
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block">Téléphone</label>
                         <input type="text" name="telephone" value="{{ old('telephone', $fournisseur->telephone) }}" class="block w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-ci-green focus:bg-white rounded-xl transition-all outline-none text-sm font-bold shadow-sm">
                     </div>
                     <div class="space-y-1">

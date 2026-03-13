@@ -1,14 +1,14 @@
 <x-app-layout>
-    <!-- Welcome Header matching mockup -->
+    <!-- En-tête de bienvenue correspondant à la maquette -->
     <div class="mb-8">
         <h1 class="text-3xl font-black text-gray-900 tracking-tight">Bonjour {{ Auth::user()->prenom }} !</h1>
         <p class="text-gray-500 font-bold mt-1">Voici le résumé de votre activité sur le parc informatique.</p>
     </div>
 
-    <!-- Stat Cards Row -->
+    <!-- Ligne des Cartes Statistiques -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-{{ Auth::user()->role === 'agent' ? '3' : '4' }} gap-6 mb-8">
         @if(Auth::user()->role === 'agent')
-            <!-- Premium Card: Mes Matériels -->
+            <!-- Carte Premium : Mes Matériels -->
             <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="flex items-start justify-between">
                     <div>
@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            <!-- Premium Card: Mes Demandes -->
+            <!-- Carte Premium : Mes Demandes -->
             <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="flex items-start justify-between">
                     <div>
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <!-- Action Card: Nouvelle Demande -->
+            <!-- Carte Action : Nouvelle Demande -->
             <a href="{{ route('demandes.create') }}" class="relative overflow-hidden bg-ci-green-dark p-6 rounded-[2rem] shadow-xl shadow-green-900/20 hover:scale-[1.02] transition-transform group block">
                 <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                 <div class="relative z-10 flex items-center justify-between h-full">
@@ -54,7 +54,7 @@
                 </div>
             </a>
         @elseif(Auth::user()->role === 'chef_cdi')
-            <!-- Premium Card: Matériel du Service -->
+            <!-- Carte Premium : Matériel du Service -->
             <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="flex items-start justify-between">
                     <div>
@@ -70,7 +70,7 @@
                 </div>
             </div>
 
-            <!-- Premium Card: Mes Matériels -->
+            <!-- Carte Premium : Mes Matériels -->
             <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="flex items-start justify-between">
                     <div>
@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            <!-- Premium Card: Mes Demandes -->
+            <!-- Carte Premium : Mes Demandes -->
             <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="flex items-start justify-between">
                     <div>
@@ -105,7 +105,7 @@
             <!-- Rôles Administratifs / Validation -->
             
             @if(Auth::user()->hasRole(['gestionnaire', 'DSI']))
-                <!-- Premium Card 1: Total Parc -->
+                <!-- Carte Premium 1 : Total Parc -->
                 <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-start justify-between">
                         <div>
@@ -128,7 +128,7 @@
                     </div>
                 </div>
 
-                <!-- Premium Card 2: Disponible -->
+                <!-- Carte Premium 2 : Disponible -->
                 <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-start justify-between">
                         <div>
@@ -145,7 +145,7 @@
                 </div>
             @endif
 
-            <!-- Premium Card: Mes Demandes (Visible par tous les admins/validators) -->
+            <!-- Carte Premium : Mes Demandes (Visible par tous les admins/validateurs) -->
             @if(!Auth::user()->isAdmin())
             <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="flex items-start justify-between">
@@ -181,7 +181,7 @@
                 </div>
             @endif
 
-            <!-- Premium Card 3: À Valider -->
+            <!-- Carte Premium 3 : À Valider -->
             @if(isset($stats['demandes_a_valider']))
             <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="flex items-start justify-between">
@@ -198,7 +198,7 @@
                 </div>
             </div>
             @elseif(isset($stats['total_users']))
-                <!-- Premium Card 1: Total Utilisateurs -->
+                <!-- Carte Premium 1 : Total Utilisateurs -->
                 <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-start justify-between">
                         <div>
@@ -217,7 +217,7 @@
                     </div>
                 </div>
 
-                <!-- Premium Card 2: Villes -->
+                <!-- Carte Premium 2 : Villes -->
                 <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-start justify-between">
                         <div>
@@ -233,7 +233,7 @@
                     </div>
                 </div>
 
-                <!-- Premium Card 3: Directions -->
+                <!-- Carte Premium 3 : Directions -->
                 <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-start justify-between">
                         <div>
@@ -269,14 +269,14 @@
     </div>
 
     @if(!in_array(Auth::user()->role, ['agent', 'admin']))
-    <!-- Main Content Grid for Managers/Validators -->
+    <!-- Grille de Contenu Principal pour Managers/Validants -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Real Charts Grid (Col span 2) -->
         <div class="lg:col-span-2 space-y-6">
             <div class="grid grid-cols-1 {{ Auth::user()->role === 'gestionnaire' ? '' : 'md:grid-cols-2' }} gap-6">
                 @if(Auth::user()->role !== 'gestionnaire')
-                <!-- Chart 1: Répartition des Demandes (Doughnut) -->
+                <!-- Graphique 1 : Répartition des Demandes (Doughnut) -->
                 <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 flex flex-col h-full min-h-[320px]">
                     <h3 class="text-sm font-black text-gray-900 tracking-tight mb-4 uppercase">
                         @if(Auth::user()->role === 'agent') Mes Demandes
@@ -301,7 +301,7 @@
                 </div>
                 @endif
 
-                <!-- Chart 2: Stock par Catégorie (Bar) -->
+                <!-- Graphique 2 : Stock par Catégorie (Bar) -->
                 <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 flex flex-col h-full min-h-[320px]">
                     <h3 class="text-sm font-black text-gray-900 tracking-tight mb-4 uppercase">
                         @if(Auth::user()->role === 'agent') Mes Matériels
@@ -444,7 +444,7 @@
             </script>
         </div>
 
-        <!-- Quick Actions Column -->
+        <!-- Colonne Actions Rapides -->
         <div class="flex flex-col space-y-6">
             <h3 class="text-xl font-black text-gray-900 tracking-tight pl-2">Actions Rapides</h3>
             
@@ -501,7 +501,7 @@
         </div>
     </div>
     @elseif(Auth::user()->role === 'admin')
-    <!-- Specific Content Grid for Admin (No charts, but Quick Actions in a better layout) -->
+    <!-- Grille de Contenu Spécifique pour l'Admin (Pas de graphiques, mais Actions Rapides mieux mises en page) -->
     <div class="mt-8">
         <h3 class="text-xl font-black text-gray-900 tracking-tight pl-2 mb-6">Actions Rapides</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

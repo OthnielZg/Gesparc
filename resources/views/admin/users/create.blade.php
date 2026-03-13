@@ -28,7 +28,7 @@
         }
     }" class="space-y-6 pt-1 pb-6 px-4">
 
-        <!-- Header -->
+        <!-- En-tête -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
                 <a href="{{ route('admin.users.index') }}" 
@@ -45,15 +45,15 @@
         </div>
 
         <div class="max-w-4xl mx-auto mt-4">
-            <!-- Form Card -->
+            <!-- Carte du Formulaire -->
             <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative overflow-hidden">
-            <!-- Decorative circle -->
+            <!-- Cercle décoratif -->
             <div class="absolute top-0 right-0 w-60 h-60 bg-ci-orange/5 rounded-full -translate-y-32 translate-x-32 pointer-events-none"></div>
 
             <form action="{{ route('admin.users.store') }}" method="POST" class="relative z-10 space-y-8">
                 @csrf
 
-                <!-- Section: Identité -->
+                <!-- Section : Identité -->
                 <div class="space-y-6">
                     <div class="flex items-center gap-3">
                         <div class="h-6 w-6 bg-ci-orange rounded flex items-center justify-center text-white">
@@ -82,7 +82,7 @@
 
                 <hr class="border-gray-50">
 
-                <!-- Section: Accès -->
+                <!-- Section : Accès -->
                 <div class="space-y-6">
                     <div class="flex items-center gap-3">
                         <div class="h-6 w-6 bg-ci-green rounded flex items-center justify-center text-white">
@@ -189,7 +189,7 @@
 
                 <hr class="border-gray-50">
 
-                <!-- Section: Sécurité -->
+                <!-- Section : Sécurité -->
                 <div class="space-y-6">
                     <div class="flex items-center gap-3">
                         <div class="h-6 w-6 bg-slate-900 rounded flex items-center justify-center text-white">
@@ -213,7 +213,7 @@
                     </div>
                 </div>
 
-                <!-- Footer Actions -->
+                <!-- Actions de pied form-->
                 <div class="pt-6 flex flex-col md:flex-row items-center justify-end gap-6">
                     <a href="{{ route('admin.users.index') }}" 
                         class="text-[9px] font-black text-gray-400 uppercase tracking-widest hover:text-red-500 transition-colors">Annuler la procédure</a>

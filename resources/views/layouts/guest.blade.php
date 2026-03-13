@@ -7,7 +7,7 @@
 
         <title>{{ config('app.name', 'GESPARC') }}</title>
 
-        <!-- Fonts -->
+        <!-- Polices -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,800,900&display=swap" rel="stylesheet" />
         
@@ -18,7 +18,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
         <script>
-            // Tailwind custom colors to match original DGI branding
+            // Couleurs personnalisées Tailwind
             document.documentElement.style.setProperty('--ci-green', '#009E60');
             document.documentElement.style.setProperty('--ci-orange', '#F77F00');
         </script>
@@ -39,7 +39,7 @@
                 ring: 0 !important;
             }
 
-            /* Fix Tailwind Forms duplicate chevron */
+            /* Correction de la flèche de sélection en double */
             select {
                 -webkit-appearance: none;
                 -moz-appearance: none;

@@ -7,7 +7,7 @@
 
         <title>{{ config('app.name', 'GESPARC') }}</title>
 
-        <!-- Fonts -->
+        <!-- Polices -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800,900&display=swap" rel="stylesheet" />
 
@@ -72,7 +72,7 @@
                 ring: 0 !important;
             }
 
-            /* Fix Tailwind Forms duplicate chevron */
+            /* Correction de la flèche de sélection en double */
             select {
                 background-image: none !important;
             }
@@ -81,12 +81,12 @@
     <body class="font-sans antialiased h-full overflow-hidden text-gray-800" x-data="{ sidebarOpen: false, desktopSidebarOpen: true, scrolled: false, showLogoutModal: false }">
         <div class="flex flex-col h-screen bg-ci-bg">
             
-            <!-- Topbar (Now on top of everything) -->
+            <!-- Barre de navigation supérieure -->
             @include('layouts.topbar')
 
-            <!-- Main Body (Sidebar + Content) -->
+            <!-- Corps de la page -->
             <div class="flex flex-1 overflow-hidden">
-                <!-- Sidebar Desktop -->
+                <!-- Sidebar Bureau -->
                 <aside class="hidden md:flex md:flex-shrink-0 z-40 relative h-full transition-all duration-300"
                        x-show="desktopSidebarOpen"
                        x-transition:enter="transition-all ease-out duration-300"
@@ -113,11 +113,11 @@
                      @click.away="sidebarOpen = false"
                      x-cloak>
                     <div class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
-                    <!-- Sidebar Panel -->
+                    <!-- Panneau Sidebar -->
                     <div class="relative flex flex-col w-[260px] bg-ci-green-dark h-full sidebar-scroll overflow-y-auto z-10">
                         @include('layouts.sidebar')
                     </div>
-                    <!-- Close Button (outside overflow container) -->
+                    <!-- Bouton de fermeture -->
                     <div class="relative pt-2 pl-2 z-10">
                         <button type="button" 
                                 @click="sidebarOpen = false"
@@ -127,7 +127,7 @@
                     </div>
                 </div>
 
-                <!-- Main Content Area -->
+                <!-- Contenu principal -->
                 <main class="flex-1 relative overflow-y-auto focus:outline-none">
                     <div class="py-6 px-4 sm:px-6 lg:px-8">
                         @if (isset($header))
@@ -142,7 +142,7 @@
             </div>
         </div>
 
-        <!-- Logout Confirmation Modal -->
+        <!-- Modale de déconnexion -->
         <div x-show="showLogoutModal" 
              class="fixed inset-0 z-[100] overflow-y-auto" 
              x-transition:enter="transition ease-out duration-300"
@@ -153,7 +153,7 @@
              x-transition:leave-end="opacity-0"
              x-cloak>
             
-            <!-- Backdrop -->
+            <!-- Fond cliquable -->
             <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
 
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">

@@ -14,10 +14,11 @@ class DemandeController extends Controller
         $user = Auth::user();
         $query = Demande::with(['utilisateur', 'chefCdi']);
 
-        // Filter by role: Agents only see their own. 
-        // Chef CDI sees their own + their service's.
-        // DR sees their own + their direction's.
-        // DSI/Gestionnaire/Admin see all.
+        // Filtrage par rôle :
+        // Les agents ne voient que les leurs.
+        // Le Chef CDI voit les siennes + celles de son service.
+        // Le DR voit les siennes + celles de sa direction.
+        // DSI/Gestionnaire/Admin voient tout.
         if ($user->hasRole(['agent'])) {
             $query->where('id_utilisateur', $user->id);
         } elseif ($user->hasRole(['chef_cdi'])) {
@@ -43,19 +44,15 @@ class DemandeController extends Controller
             $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
             
             if ($directionId) {
-                $direction = \App\Models\Direction::find($directionId);
-                $idVille = $direction?->id_ville;
-
-                if ($idVille) {
-                    $query->where(function ($q) use ($user, $idVille) {
-                        $q->where('id_utilisateur', $user->id)
-                          ->orWhereHas('utilisateur.bureau.service.direction', function ($dq) use ($idVille) {
-                              $dq->where('id_ville', $idVille);
-                          });
-                    });
-                } else {
-                    $query->where('id_utilisateur', $user->id);
-                }
+                $query->where(function ($q) use ($user, $directionId) {
+                    $q->where('id_utilisateur', $user->id)
+                      ->orWhereHas('utilisateur.bureau.service', function ($sq) use ($directionId) {
+                          $sq->where('id_direction', $directionId);
+                      })
+                      ->orWhereHas('utilisateur', function ($uq) use ($directionId) {
+                          $uq->where('id_direction', $directionId);
+                      });
+                });
             } else {
                 $query->where('id_utilisateur', $user->id);
             }
@@ -150,7 +147,7 @@ class DemandeController extends Controller
     }
 
     /**
-     * Officialise a pre-demande (Called by Chef CDI)
+     * Officialise une pré-demande (Appelé par le Chef CDI)
      */
     public function officialise(Request $request, Demande $demande)
     {

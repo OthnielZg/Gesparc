@@ -12,7 +12,7 @@
     </x-slot>
 
     <div class="max-w-4xl mx-auto">
-        <!-- Main Form Area -->
+        <!-- Zone Principale du Formulaire -->
         <div class="w-full">
             <div
                 class="bg-white rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 overflow-hidden">
@@ -59,7 +59,7 @@
                                 </div>
                             </div>
 
-                            <!-- Priorité (Tuteur 100%) -->
+                            <!-- Priorité (Taille 100%) -->
                             <div class="space-y-2 md:col-span-3">
                                 <label
                                     class="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1 block">Urgence

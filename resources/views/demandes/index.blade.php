@@ -16,7 +16,7 @@
         </div>
     </x-slot>
     
-    <!-- Filters & Search -->
+    <!-- Filtres et Recherche -->
     <div class="bg-white p-2 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-gray-100 mb-8 p-8 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-32 h-32 bg-gray-50/50 rounded-full -translate-y-16 translate-x-16 pointer-events-none"></div>
         <form action="{{ route('demandes.index') }}" method="GET" class="flex flex-col md:flex-row gap-6 items-end relative z-10">
@@ -51,7 +51,7 @@
         </form>
     </div>
 
-    <!-- Table -->
+    <!-- Tableau -->
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">

@@ -21,7 +21,7 @@
             </div>
         </x-slot>
 
-        <!-- Stats Overview -->
+        <!-- Aperçu des Statistiques -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5 group hover:border-ci-orange transition-all">
                 <div class="h-12 w-12 bg-ci-orange/5 rounded-2xl flex items-center justify-center text-ci-orange group-hover:scale-110 transition-transform">
@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <!-- Toolbar & Search -->
+        <!-- Barre d'outils et Recherche -->
         <div class="bg-white p-4 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col lg:flex-row items-center justify-between gap-6">
             <div class="flex items-center gap-4">
                 <div class="h-10 w-10 bg-gray-50 rounded-xl flex items-center justify-center text-slate-400 border border-gray-100">
@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        <!-- Users Table (Uniform Dashboard Style) -->
+        <!-- Tableau des Utilisateurs (Style Tableau de Bord Uniforme) -->
         <div class="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.01)] relative min-h-[400px]">
             <table class="w-full text-left">
                 <thead>

@@ -1,16 +1,16 @@
 <x-guest-layout>
     <div class="min-h-[100dvh] md:h-screen flex flex-col md:flex-row overflow-hidden bg-white">
         
-        <!-- Left Section: Image (S'adapte: caché sur mobile, visible sur tablette/PC) -->
+        <!-- Section Gauche : Image (S'adapte : caché sur mobile, visible sur tablette/PC) -->
         <div class="relative hidden md:block md:w-1/2 lg:w-3/5 h-full overflow-hidden">
             <img src="{{ asset('images/bg_dgi.webp') }}" 
                  alt="DGI Background" 
                  class="absolute inset-0 w-full h-full object-cover object-center animate-slow-zoom">
             
-            <!-- Overlay with DGI Colors -->
+            <!-- Superposition avec les couleurs DGI -->
             <div class="absolute inset-0 bg-gradient-to-br from-[#009E60]/60 to-slate-900/80 mix-blend-multiply"></div>
             
-            <!-- Branding on Image -->
+            <!-- Le "Branding" sur l'image -->
             <div class="absolute inset-0 flex flex-col justify-end p-8 lg:p-12 text-white">
                 <h2 class="text-3xl lg:text-4xl font-black leading-tight mb-2">
                     Simplifier la gestion,<br>
@@ -22,11 +22,10 @@
             </div>
         </div>
 
-        <!-- Right Section: Login Form (Prend toute la place sur mobile) -->
+        <!-- Section Droite : Formulaire de connexion (Prend toute la place sur mobile) -->
         <div class="flex-1 w-full flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-white z-10 relative md:shadow-2xl overflow-y-auto">
             <div class="w-full max-w-md">
-                <!-- Logo & Title -->
-                <!-- Logo & Title -->
+                <!-- Logo et Titre -->
                 <div class="text-center mb-6">
                     <img src="{{ asset('images/logo_dgi.png') }}" alt="Logo DGI" class="h-20 mx-auto mb-4 drop-shadow-sm">
                     <h1 class="text-2xl font-black text-gray-900 tracking-tighter uppercase">
@@ -35,10 +34,10 @@
                     <p class="text-gray-500 text-[10px] mt-1 font-medium uppercase tracking-widest">République de Côte d'Ivoire</p>
                 </div>
 
-                <!-- Session Status -->
+                <!-- Statut de la Session -->
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <!-- Info Message (Session Expired, etc.) -->
+                <!-- Message d'information (Session expirée, etc.) -->
                 @if(session('info'))
                     <div class="mb-4 p-4 rounded-2xl bg-blue-50 border border-blue-100 flex items-center gap-3">
                         <i class="fa-solid fa-circle-info text-blue-500"></i>
@@ -46,7 +45,7 @@
                     </div>
                 @endif
 
-                <!-- Validation Errors -->
+                <!-- Erreurs de validation -->
                 @if ($errors->any())
                     <div class="mb-4 p-4 rounded-2xl bg-red-50 border border-red-100">
                         <ul class="text-xs font-bold text-red-600 space-y-1">
@@ -60,7 +59,7 @@
                 <form method="POST" action="{{ route('login') }}" class="space-y-5 {{ $errors->any() ? 'mt-4' : 'mt-8' }}">
                     @csrf
 
-                    <!-- Email Address -->
+                    <!-- Adresse Email -->
                     <div class="relative group">
                         <label for="email" class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block transition-colors group-focus-within:text-ci-orange">
                             Email professionnel
@@ -75,7 +74,7 @@
                         </div>
                     </div>
 
-                    <!-- Password -->
+                    <!-- Mot de passe -->
                     <div class="relative group mt-4 "x-data="{ show: false }">
                         <label for="password" class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block transition-colors group-focus-within:text-ci-orange">
                             Mot de passe
@@ -96,7 +95,7 @@
                         </div>
                     </div>
 
-                    <!-- Remember Me -->
+                    <!-- Se souvenir de moi -->
                     <div class="block mt-4 flex items-center justify-between">
                         <label for="remember_me" class="inline-flex items-center">
                             <input id="remember_me" type="checkbox" class="rounded-lg border-gray-300 text-ci-orange shadow-sm focus:ring-ci-orange" name="remember">

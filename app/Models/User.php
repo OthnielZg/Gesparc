@@ -42,7 +42,7 @@ class User extends Authenticatable
         ];
     }
 
-    // Role constants
+    // Constantes des rôles
     const ROLE_ADMIN = 'admin';
 
     const ROLE_AGENT = 'agent';
@@ -142,7 +142,7 @@ class User extends Authenticatable
         return $this->prenom.' '.$this->nom;
     }
 
-    // Relationships
+    // Relations
     public function bureau()
     {
         return $this->belongsTo(Bureau::class, 'id_bureau');

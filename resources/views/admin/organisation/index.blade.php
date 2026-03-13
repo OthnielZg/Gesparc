@@ -14,12 +14,12 @@
             </div>
         </x-slot>
 
-        <!-- Quick Stats Overview -->
+        <!-- Aperçu Rapide des Statistiques -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- ... (stats restent identiques) ... -->
         </div>
 
-        <!-- Dashboard Navigation & Search + ACTION BUTTON -->
+        <!-- Navigation du Tableau de Bord & Recherche + BOUTON D'ACTION -->
         <div class="bg-white p-4 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col xl:flex-row items-center justify-between gap-6">
             <div class="flex flex-col xl:flex-row items-center gap-4 w-full xl:w-auto">
                 <nav class="flex flex-wrap gap-2 p-1.5 bg-gray-50 rounded-2xl border border-gray-100/50">
@@ -42,7 +42,7 @@
                     </button>
                 </nav>
 
-                <!-- NEW BUTTON POSITION: Right next to tabs to be sure it's visible -->
+                <!-- NOUVELLE POSITION DU BOUTON : Juste à côté des onglets pour être sûr de sa visibilité -->
                 <div x-show="activeTab !== 'add'" x-transition class="flex-shrink-0">
                     <button @click="addType = activeTab.slice(0, -1); activeTab = 'add'" 
                         class="inline-flex items-center px-6 py-3.5 bg-ci-green text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-ci-green/10 hover:scale-105 transition-all active:scale-95">
@@ -63,10 +63,10 @@
             </div>
         </div>
 
-        <!-- Main Content (Table Style) -->
+        <!-- Contenu Principal (Style Tableau) -->
         <div class="relative min-h-[400px]">
 
-            <!-- TAB: VILLES -->
+            <!-- ONGLET : VILLES -->
             <div x-show="activeTab === 'villes'" x-transition class="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.01)]">
                 <table class="w-full text-left">
                     <thead>
@@ -106,7 +106,7 @@
                 </table>
             </div>
 
-            <!-- TAB: DIRECTIONS -->
+            <!-- ONGLET : DIRECTIONS -->
             <div x-show="activeTab === 'directions'" x-transition class="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.01)]">
                 <table class="w-full text-left">
                     <thead>
@@ -143,7 +143,7 @@
                 </table>
             </div>
 
-            <!-- TAB: SERVICES -->
+            <!-- ONGLET : SERVICES -->
             <div x-show="activeTab === 'services'" x-transition class="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.01)]">
                 <table class="w-full text-left">
                     <thead>
@@ -183,7 +183,7 @@
                 </table>
             </div>
 
-            <!-- TAB: BUREAUX -->
+            <!-- ONGLET : BUREAUX -->
             <div x-show="activeTab === 'bureaux'" x-transition class="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.01)]">
                 <table class="w-full text-left">
                     <thead>
@@ -218,7 +218,7 @@
                 </table>
             </div>
 
-            <!-- TAB: AJOUT (Standard App Style) -->
+            <!-- ONGLET : AJOUT (Style Standard de l'Application) -->
             <div x-show="activeTab === 'add'" x-cloak x-transition class="max-w-4xl mx-auto space-y-8 py-10">
                 <div class="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-[0_20px_80px_rgba(0,0,0,0.05)] relative overflow-hidden">
                     
@@ -234,7 +234,7 @@
                         <button @click="activeTab = addType + 's'" class="h-14 w-14 bg-gray-50 flex items-center justify-center rounded-[1.25rem] text-gray-400 hover:text-slate-900 transition-all border border-gray-100 shadow-sm"><i class="fa-solid fa-arrow-left"></i></button>
                     </div>
 
-                    <!-- Ville form -->
+                    <!-- Formulaire Ville -->
                     <div x-show="addType === 'ville'" x-cloak class="relative z-10">
                         <form action="{{ route('admin.organisation.ville.store') }}" method="POST" class="space-y-10">
                             @csrf
@@ -248,7 +248,7 @@
                         </form>
                     </div>
 
-                    <!-- Direction form -->
+                    <!-- Formulaire Direction -->
                     <div x-show="addType === 'direction'" x-cloak class="relative z-10">
                         <form action="{{ route('admin.organisation.direction.store') }}" method="POST" class="space-y-10">
                             @csrf
@@ -273,7 +273,7 @@
                         </form>
                     </div>
 
-                    <!-- Service form -->
+                    <!-- Formulaire Service -->
                     <div x-show="addType === 'service'" x-cloak class="relative z-10">
                         <form action="{{ route('admin.organisation.service.store') }}" method="POST" class="space-y-10">
                             @csrf
@@ -300,7 +300,7 @@
                         </form>
                     </div>
 
-                    <!-- Bureau form -->
+                    <!-- Formulaire Bureau -->
                     <div x-show="addType === 'bureau'" x-cloak class="relative z-10">
                         <form action="{{ route('admin.organisation.bureau.store') }}" method="POST" class="space-y-10">
                             @csrf

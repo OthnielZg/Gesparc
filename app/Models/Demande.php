@@ -39,7 +39,7 @@ class Demande extends Model
         return 'REF-'.$date.'-'.str_pad($count, 4, '0', STR_PAD_LEFT);
     }
 
-    // Status labels
+    // Libellés des statuts
     public static function statutLabel(): array
     {
         return [

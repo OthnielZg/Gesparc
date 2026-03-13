@@ -10,7 +10,7 @@
         </div>
     </x-slot>
 
-    <!-- Workflow Stepper (Premium Ultra-Compact) -->
+    <!-- Indicateur d'Étape de Workflow (Premium Ultra-Compact) -->
     <div class="mb-4">
         <div class="bg-white px-2 py-4 sm:p-5 rounded-3xl shadow-sm border border-gray-100 overflow-hidden relative">
             <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-gray-100 to-transparent"></div>
@@ -46,14 +46,14 @@
             <div class="flex items-start justify-between relative px-2">
                 @foreach($steps as $idx => $step)
                     <div class="flex-1 flex flex-col items-center relative z-10 w-0">
-                        <!-- Connecting Line (Next segment) -->
+                        <!-- Ligne de Connexion (Segment Suivant) -->
                         @if($idx < 5)
                             <div class="absolute top-[17px] left-1/2 w-full h-[3px] bg-gray-100 -z-10 rounded-r-full overflow-hidden">
                                 <div class="h-full bg-ci-green transition-all duration-1000" style="width: {{ $currentIdx > $idx ? '100' : '0' }}%"></div>
                             </div>
                         @endif
 
-                        <!-- Circle Indicator -->
+                        <!-- Indicateur Circulaire -->
                         <div class="h-[34px] w-[34px] rounded-xl flex items-center justify-center transition-all duration-500 ring-4 ring-white
                             {{ $currentIdx > $idx || ($demande->statut == 'validee' && $idx == 5) ? 'bg-ci-green text-white shadow-sm shadow-green-200' : 
                                ($currentIdx == $idx && !$isFailed ? 'bg-ci-orange text-white scale-[1.15] shadow-md shadow-orange-200 rotate-6' : 
@@ -75,9 +75,9 @@
         </div>
     </div>
 
-    <!-- Details Content (Layout 50/50) -->
+    <!-- Contenu des Détails (Mise en page 50/50) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Left: Infos & Historique -->
+        <!-- Gauche : Infos et Historique -->
         <div class="space-y-8">
             <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                 <div class="flex justify-between items-start mb-8">
@@ -110,7 +110,7 @@
                 </div>
             </div>
 
-            <!-- Validation Timeline -->
+            <!-- Chronologie des Validations -->
             @if($demande->validations->count() > 0)
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                     <h4 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 border-l-4 border-ci-green pl-4">Historique des Validations</h4>
@@ -138,9 +138,9 @@
             @endif
         </div>
 
-        <!-- Right: Actions & Décisions -->
+        <!-- Droite : Actions et Décisions -->
         <div class="space-y-8">
-            <!-- Context Box (Sober Design) -->
+            <!-- Boîte de Contexte (Design Sobre) -->
             <div class="bg-white p-5 sm:p-6 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 relative overflow-hidden hover:shadow-lg">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-full blur-3xl -mr-16 -mt-16"></div>
                 <h4 class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
@@ -224,7 +224,7 @@
                             Rejeter ce dossier
                         </button>
 
-                        <!-- Modal standard -->
+                        <!-- Fenêtre modale standard -->
                         <div x-show="open" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4"
                              x-transition:enter="transition ease-out duration-300"
                              x-transition:enter-start="opacity-0"
@@ -236,7 +236,7 @@
                                  x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                                  @click.away="open = false">
                                 
-                                <!-- Modal Header -->
+                                <!-- En-tête de la modale -->
                                 <div class="px-8 pt-8 pb-4 flex items-center gap-4 bg-white/50 backdrop-blur-sm border-b border-gray-50">
                                     <div class="h-12 w-12 rounded-2xl flex items-center justify-center flex-shrink-0" :class="decision == 'OK' ? 'bg-green-50 text-ci-green' : 'bg-red-50 text-red-500'">
                                         <i class="fa-solid text-xl" :class="decision == 'OK' ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
@@ -251,7 +251,7 @@
                                     @csrf
                                     <input type="hidden" name="decision" :value="decision">
                                     
-                                    <!-- Modal Body (Scrollable) -->
+                                    <!-- Corps de la modale (Défilable) -->
                                     <div class="px-8 py-6 max-h-[60vh] overflow-y-auto custom-scrollbar-minimal space-y-6">
                                         @if($user->isGestionnaire())
                                             <div class="bg-gray-50/50 p-5 rounded-3xl space-y-4 border border-gray-100 relative overflow-hidden">
@@ -288,7 +288,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Modal Footer (Fixed) -->
+                                    <!-- Pied de page de la modale (Fixe) -->
                                     <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex gap-4">
                                         <button type="button" @click="open = false" class="flex-1 py-4 text-gray-400 font-black uppercase tracking-widest text-[10px] hover:text-gray-600 transition-colors">Abroger</button>
                                         <button type="submit" class="flex-[2] py-4 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
@@ -507,7 +507,7 @@
                 @endif
             </div>
 
-            <!-- Final Result Box (Bordereau) -->
+            <!-- Boîte de Résultat Final (Bordereau) -->
             @if($demande->statut == 'validee' && $demande->affectation)
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-50 text-gray-900 border-t-8 border-t-ci-green">
                     <h4 class="text-[10px] font-black text-ci-green uppercase tracking-[0.2em] mb-6 block">Bordereau d'Affectation</h4>

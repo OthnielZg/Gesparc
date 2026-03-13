@@ -1,7 +1,7 @@
 <div class="flex flex-col h-full text-white">
-    <!-- Navigation (Scrollable Zone) -->
+    <!-- Navigation -->
     <nav class="flex-1 min-h-0 px-4 py-8 space-y-2 overflow-y-auto sidebar-scroll">
-        <!-- Section: Personnel -->
+        <!-- Personnel -->
         <div class="pb-2">
             <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Personnel</p>
         </div>
@@ -29,7 +29,7 @@
             </x-nav-link>
         @endif
 
-        <!-- Section: Validations (Contextual based on role) -->
+        <!-- Validations -->
         @if(Auth::user()->hasRole(['chef_cdi', 'DR', 'gestionnaire', 'SDGRTE', 'DSI']))
             <div class="pt-6 pb-2">
                 <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Validations</p>
@@ -66,7 +66,7 @@
             @endif
         @endif
 
-        <!-- Section: Inventaire (Gestionnaires & Admin) -->
+        <!-- Inventaire -->
         @if(Auth::user()->hasRole(['admin', 'gestionnaire']))
             <div class="pt-6 pb-2">
                 <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Inventaire</p>
@@ -80,7 +80,7 @@
             </x-nav-link>
         @endif
 
-        <!-- Section: Administration (Admin only) -->
+        <!-- Administration -->
         @if(Auth::user()->hasRole(['admin']))
             <div class="pt-6 pb-2">
                 <p class="px-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Administration</p>
@@ -99,7 +99,7 @@
         @endif
     </nav>
 
-    <!-- Footer Logout Area -->
+    <!-- Bouton de déconnexion -->
     <div class="p-6 mt-auto">
         <button @click="showLogoutModal = true"
             class="w-full flex items-center px-4 py-3 text-sm font-bold text-white/50 hover:text-white hover:bg-white/5 rounded-2xl transition-colors group">

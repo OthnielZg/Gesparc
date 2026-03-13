@@ -3,14 +3,14 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <!-- Profile Summary Card -->
+            <!-- Carte de Résumé du Profil -->
             <div
                 class="p-8 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:rounded-[2rem] border border-gray-100 relative overflow-hidden">
-                <!-- Decorative background block -->
+                <!-- Bloc d'arrière-plan décoratif -->
                 <div class="absolute top-0 left-0 right-0 h-32 bg-ci-green"></div>
 
                 <div class="relative flex flex-col items-center mt-12">
-                    <!-- Large Avatar Circle -->
+                    <!-- Cercle Avatar Grand Format -->
                     <div
                         class="h-32 w-32 rounded-full bg-white border-4 border-white shadow-xl flex items-center justify-center overflow-hidden text-ci-orange font-black text-5xl z-10">
                         @if(isset(Auth::user()->photo_path) && Auth::user()->photo_path)
@@ -21,7 +21,7 @@
                         @endif
                     </div>
 
-                    <!-- User Info Text -->
+                    <!-- Texte d'Information de l'Utilisateur -->
                     <div class="mt-6 text-center">
                         <h3 class="text-3xl font-black text-gray-900 tracking-tight">{{ Auth::user()->full_name }}</h3>
                         <div class="mt-2 inline-flex items-center px-4 py-1.5 rounded-full bg-ci-bg text-ci-green-dark">
@@ -34,14 +34,14 @@
                 </div>
             </div>
 
-            <!-- Photo Update Card (Tuteur 100%) -->
+            <!-- Carte de Mise à Jour de la Photo (Taille 100%) -->
             <div class="p-8 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:rounded-[2rem] border border-gray-100">
                 <div class="max-w-3xl mx-auto">
                     @include('profile.partials.update-photo-form')
                 </div>
             </div>
 
-            <!-- Password Update Card -->
+            <!-- Carte de Mise à Jour du Mot de Passe -->
             <div class="p-8 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:rounded-[2rem] border border-gray-100">
                 <div class="max-w-3xl mx-auto">
                     @include('profile.partials.update-password-form')

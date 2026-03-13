@@ -38,16 +38,15 @@ class ValidationController extends Controller
             $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
             
             if ($directionId) {
-                $direction = \App\Models\Direction::find($directionId);
-                $idVille = $direction?->id_ville;
-
-                if ($idVille) {
-                    $query->whereHas('utilisateur.bureau.service.direction', function ($q) use ($idVille) {
-                        $q->where('id_ville', $idVille);
-                    });
-                } else {
-                    $query->where('id_utilisateur', $user->id); // Fallback
-                }
+                $query->where(function ($q) use ($user, $directionId) {
+                    $q->where('id_utilisateur', $user->id)
+                      ->orWhereHas('utilisateur.bureau.service', function ($sq) use ($directionId) {
+                          $sq->where('id_direction', $directionId);
+                      })
+                      ->orWhereHas('utilisateur', function ($uq) use ($directionId) {
+                          $uq->where('id_direction', $directionId);
+                      });
+                });
             } else {
                 $query->where('id_utilisateur', $user->id); // Fallback
             }
