@@ -117,8 +117,14 @@
                     <div class="space-y-6">
                         @foreach($demande->validations as $v)
                             <div class="flex gap-4 p-4 rounded-2xl {{ $v->decision == 'OK' ? 'bg-green-50' : 'bg-red-50' }}">
-                                <div class="h-10 w-10 flex-shrink-0 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400">
-                                    <i class="fa-solid fa-user-shield text-sm"></i>
+                                <div class="h-10 w-10 flex-shrink-0 rounded-xl bg-white border border-gray-100 flex items-center justify-center overflow-hidden ring-2 ring-white">
+                                    @if($v->utilisateur->photo_path)
+                                        <img src="{{ asset('storage/' . $v->utilisateur->photo_path) }}" class="h-full w-full object-cover">
+                                    @else
+                                        <div class="h-full w-full bg-slate-50 flex items-center justify-center text-gray-400 text-[10px] font-black uppercase">
+                                            {{ substr($v->utilisateur->prenom, 0, 1) }}{{ substr($v->utilisateur->nom, 0, 1) }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2 mb-1">

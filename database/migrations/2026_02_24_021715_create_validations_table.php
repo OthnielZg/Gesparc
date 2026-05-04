@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_demande')->constrained('demandes')->cascadeOnDelete();
             $table->foreignId('id_utilisateur')->constrained('users')->cascadeOnDelete();
-            $table->enum('decision', ['OK', 'KO']);
-            $table->enum('niveau_validation', ['chef_cdi', 'DR', 'gestionnaire', 'SDREVT', 'DSI']);
+            $table->string('decision', 50);
+            $table->string('niveau_validation', 100);
             $table->text('commentaire')->nullable();
             $table->timestamps();
         });

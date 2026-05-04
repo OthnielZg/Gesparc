@@ -1,8 +1,28 @@
 <x-app-layout>
-    <!-- En-tête de bienvenue correspondant à la maquette -->
+    <!-- En-tête de bienvenue adapté au rôle -->
     <div class="mb-8">
-        <h1 class="text-3xl font-black text-gray-900 tracking-tight">Bonjour {{ Auth::user()->prenom }} !</h1>
-        <p class="text-gray-500 font-bold mt-1">Voici le résumé de votre activité sur le parc informatique.</p>
+        <h1 class="text-3xl font-black text-slate-800 tracking-tight uppercase leading-none">
+            Bonjour, {{ Auth::user()->prenom }}
+            @if(Auth::user()->role === 'DR')
+                <span class="text-ci-green">&nbsp;&mdash; Directeur Régional</span>
+            @elseif(Auth::user()->role === 'gestionnaire')
+                <span class="text-ci-green">&nbsp;&mdash; Gestionnaire</span>
+            @elseif(Auth::user()->role === 'DSI')
+                <span class="text-ci-green">&nbsp;&mdash; DSI</span>
+            @elseif(Auth::user()->role === 'SDGRTE')
+                <span class="text-ci-green">&nbsp;&mdash; SDGRTE</span>
+            @elseif(Auth::user()->role === 'chef_cdi')
+                <span class="text-ci-green">&nbsp;&mdash; Chef CDI</span>
+            @endif
+        </h1>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">
+            @if(Auth::user()->role === 'DR') Vue de pilotage régional
+            @elseif(Auth::user()->role === 'gestionnaire') Suivi du stock et des demandes
+            @elseif(in_array(Auth::user()->role, ['DSI', 'SDGRTE'])) Validation des dossiers en attente
+            @elseif(Auth::user()->role === 'chef_cdi') Suivi du service et de vos demandes
+            @else Résumé de votre activité sur le parc informatique
+            @endif
+        </p>
     </div>
 
     <!-- Ligne des Cartes Statistiques -->
@@ -164,25 +184,64 @@
             @endif
 
             @if(Auth::user()->role === 'DR')
-                <!-- Premium Card: Services Direction -->
-                <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <div class="flex items-center space-x-2 mb-4">
-                                <div class="bg-ci-green-dark text-white p-2 rounded-xl shadow-md shadow-green-900/20">
-                                    <i class="fa-solid fa-briefcase"></i>
+            <!-- Carte Premium : Dossiers en attente (DR) -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative group md:col-span-2">
+                <a href="{{ route('validations.index') }}" class="absolute inset-0 z-10"></a>
+                <div class="flex items-start justify-between h-full">
+                    <div class="flex flex-col justify-between h-full w-full">
+                        <div class="flex items-center justify-between w-full mb-4">
+                            <div class="flex items-center space-x-2">
+                                <div class="bg-amber-500 text-white p-2 rounded-xl shadow-md shadow-amber-500/30">
+                                    <i class="fa-solid fa-clock"></i>
                                 </div>
-                                <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Services</span>
+                                <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Dossiers en attente</span>
                             </div>
-                            <h3 class="text-4xl font-black text-gray-900">{{ $stats['total_services'] ?? 0 }}</h3>
-                            <p class="text-[10px] font-bold text-ci-green-dark uppercase tracking-widest mt-1">Entités rattachées</p>
+                            <!-- Flèche indicative -->
+                            <div class="bg-gray-50 text-gray-300 h-8 w-8 flex items-center justify-center rounded-full group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <h3 class="text-4xl font-black text-gray-900">{{ $stats['demandes_a_valider'] }}</h3>
+                            <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-1">Action requise</p>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Carte Premium : Directions actives (DR) -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex items-start justify-between h-full">
+                    <div class="w-full flex flex-col justify-between h-full">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="bg-ci-green text-white p-2 rounded-xl shadow-md shadow-ci-green/30">
+                                <i class="fa-solid fa-sitemap"></i>
+                            </div>
+                            <span class="text-sm font-black text-gray-500 tracking-wide uppercase">Directions actives</span>
+                        </div>
+                        <div class="flex items-end justify-between w-full mt-auto">
+                            <div>
+                                <h3 class="text-4xl font-black text-gray-900">{{ $stats['directions_region']->count() }}</h3>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{{ $stats['nom_ville'] }}</p>
+                            </div>
+                            @php
+                                $saines = $stats['directions_region']->where('health', 'healthy')->count();
+                                $total  = $stats['directions_region']->count();
+                                $pct    = $total > 0 ? round(($saines / $total) * 100) : 0;
+                            @endphp
+                            <div class="text-right">
+                                <span class="text-xl font-black text-ci-green leading-none">{{ $pct }}%</span>
+                                <p class="text-[8px] font-bold text-ci-green uppercase tracking-widest mt-0.5">Opérationnelles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             @endif
 
+
             <!-- Carte Premium 3 : À Valider -->
-            @if(isset($stats['demandes_a_valider']))
+            @if(isset($stats['demandes_a_valider']) && Auth::user()->role !== 'DR')
             <div class="bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="flex items-start justify-between">
                     <div>
@@ -268,24 +327,117 @@
         @endif
     </div>
 
-    @if(!in_array(Auth::user()->role, ['agent', 'admin']))
-    <!-- Grille de Contenu Principal pour Managers/Validants -->
+
+
+    @if(Auth::user()->role === 'DR')
+    <div class="space-y-6">
+
+        <!-- Radar Territorial Enrichi -->
+        <div class="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-8 py-5 bg-slate-50/50 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="text-xs font-black text-slate-900 uppercase tracking-widest flex items-center">
+                    <i class="fa-solid fa-radar mr-3 text-ci-green"></i> Pilotage Régional
+                    <span class="mx-3 text-gray-200">|</span>
+                    <span class="text-gray-400 font-bold">{{ $stats['nom_ville'] }}</span>
+                </h3>
+                <a href="{{ route('validations.index') }}" class="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-black transition-all">
+                    <i class="fa-solid fa-check-double text-[8px]"></i> Valider
+                </a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">
+                            <th class="px-8 py-4">Direction</th>
+                            <th class="px-8 py-4">État</th>
+                            <th class="px-8 py-4">Dossiers</th>
+                            <th class="px-8 py-4">Charge</th>
+                            <th class="px-8 py-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach($stats['directions_region'] as $direction)
+                        @php
+                            $maxAttente = $stats['directions_region']->max('attente_validation') ?: 1;
+                            $pctBar     = min(100, round(($direction->attente_validation / $maxAttente) * 100));
+                            $barColor   = $direction->health === 'unhealthy' ? 'bg-red-400'
+                                        : ($direction->health === 'needs_action' ? 'bg-ci-orange' : 'bg-ci-green');
+                        @endphp
+                        <tr class="hover:bg-slate-50/40 transition-colors">
+                            <td class="px-8 py-4">
+                                <span class="text-sm font-bold text-slate-900">{{ $direction->nom_direction }}</span>
+                            </td>
+                            <td class="px-8 py-4">
+                                @if($direction->health === 'unhealthy')
+                                    <span class="text-[9px] font-black py-1 px-2.5 bg-red-50 text-red-600 rounded-md border border-red-100 uppercase">Urgent</span>
+                                @elseif($direction->health === 'needs_action')
+                                    <span class="text-[9px] font-black py-1 px-2.5 bg-orange-50 text-ci-orange rounded-md border border-orange-100 uppercase">À traiter</span>
+                                @else
+                                    <span class="text-[9px] font-black py-1 px-2.5 bg-green-50 text-ci-green rounded-md border border-green-100 uppercase">OK</span>
+                                @endif
+                            </td>
+                            <td class="px-8 py-4">
+                                <span class="text-sm font-black text-slate-700">{{ $direction->attente_validation }}</span>
+                            </td>
+                            <td class="px-8 py-4 w-40">
+                                <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                    <div class="h-1.5 rounded-full {{ $barColor }} transition-all" style="width: {{ $pctBar }}%"></div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-4 text-right">
+                                <a href="{{ route('validations.index') }}" class="text-ci-green font-black text-[10px] uppercase hover:underline">Ouvrir</a>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2 Charts côte à côte -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Chart 1 : Parc par Catégorie (Bar) -->
+            <div class="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-8 py-4 bg-slate-50/60 border-b border-gray-100">
+                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Parc par Catégorie</span>
+                </div>
+                <div class="p-6" style="height:280px">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            <!-- Chart 2 : État des Directions (Doughnut) -->
+            <div class="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-8 py-4 bg-slate-50/60 border-b border-gray-100">
+                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">État des Directions</span>
+                </div>
+                <div class="p-6" style="height:280px">
+                    <canvas id="healthChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    @elseif(!in_array(Auth::user()->role, ['agent', 'admin']))
+    <!-- Grille de Contenu Principal pour Managers/Validants (Gestionnaire / DSI) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- ... reste identique pour les autres rôles ... -->
         
         <!-- Real Charts Grid (Col span 2) -->
         <div class="lg:col-span-2 space-y-6">
             <div class="grid grid-cols-1 {{ Auth::user()->role === 'gestionnaire' ? '' : 'md:grid-cols-2' }} gap-6">
                 @if(Auth::user()->role !== 'gestionnaire')
                 <!-- Graphique 1 : Répartition des Demandes (Doughnut) -->
-                <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 flex flex-col h-full min-h-[320px]">
-                    <h3 class="text-sm font-black text-gray-900 tracking-tight mb-4 uppercase">
-                        @if(Auth::user()->role === 'agent') Mes Demandes
-                        @elseif(Auth::user()->role === 'chef_cdi') Demandes du Service
-                        @elseif(Auth::user()->role === 'DR') Demandes Direction
-                        @elseif(Auth::user()->role === 'admin') Répartition par Rôle
-                        @else État du Workflow @endif
-                    </h3>
-                    <div class="flex-1 relative">
+                <div class="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden h-full flex flex-col">
+                    <div class="px-8 py-4 bg-slate-50/60 border-b border-gray-100 flex-shrink-0">
+                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                            @if(Auth::user()->role === 'agent') Mes Demandes
+                            @elseif(Auth::user()->role === 'chef_cdi') Demandes du Service
+                            @elseif(Auth::user()->role === 'DR') Demandes Direction
+                            @elseif(Auth::user()->role === 'admin') Répartition par Rôle
+                            @else État du Workflow @endif
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 relative min-h-[250px]">
                         @if(Auth::user()->role === 'admin')
                             <canvas id="adminRoleChart"></canvas>
                         @else
@@ -302,15 +454,17 @@
                 @endif
 
                 <!-- Graphique 2 : Stock par Catégorie (Bar) -->
-                <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 flex flex-col h-full min-h-[320px]">
-                    <h3 class="text-sm font-black text-gray-900 tracking-tight mb-4 uppercase">
-                        @if(Auth::user()->role === 'agent') Mes Matériels
-                        @elseif(Auth::user()->role === 'chef_cdi') Stock du Service
-                        @elseif(Auth::user()->role === 'DR') Stock Direction
-                        @elseif(Auth::user()->role === 'admin') Structure Organisationnelle
-                        @else Stock par Catégorie @endif
-                    </h3>
-                    <div class="flex-1 relative">
+                <div class="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden h-full flex flex-col">
+                    <div class="px-8 py-4 bg-slate-50/60 border-b border-gray-100 flex-shrink-0">
+                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                            @if(Auth::user()->role === 'agent') Mes Matériels
+                            @elseif(Auth::user()->role === 'chef_cdi') Stock du Service
+                            @elseif(Auth::user()->role === 'DR') Stock Direction
+                            @elseif(Auth::user()->role === 'admin') Structure Organisationnelle
+                            @else Stock par Catégorie @endif
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 relative min-h-[250px]">
                         @if(Auth::user()->role === 'admin')
                             <canvas id="adminStructureChart"></canvas>
                         @else
@@ -326,122 +480,6 @@
                 </div>
             </div>
 
-            <!-- Scripts pour les graphiques -->
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // --- Graphiques Standards ---
-                    const repartitionData = @json($repartitionStatut);
-                    const statusCanvas = document.getElementById('statusChart');
-                    if (statusCanvas && repartitionData.length > 0) {
-                        const ctxStatus = statusCanvas.getContext('2d');
-                        new Chart(ctxStatus, {
-                            type: 'doughnut',
-                            data: {
-                                labels: repartitionData.map(item => item.label),
-                                datasets: [{
-                                    data: repartitionData.map(item => item.total),
-                                    backgroundColor: repartitionData.map(item => item.color),
-                                    borderWidth: 0,
-                                    hoverOffset: 10
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        position: 'bottom',
-                                        labels: { padding: 20, usePointStyle: true, font: { size: 10, weight: 'bold' } }
-                                    }
-                                },
-                                cutout: '75%'
-                            }
-                        });
-                    }
-
-                    const categoryData = @json($stockParCategorie);
-                    const categoryCanvas = document.getElementById('categoryChart');
-                    if (categoryCanvas && categoryData.length > 0) {
-                        const ctxCategory = categoryCanvas.getContext('2d');
-                        new Chart(ctxCategory, {
-                            type: 'bar',
-                            data: {
-                                labels: categoryData.map(item => item.categorie),
-                                datasets: [{
-                                    label: 'Unités',
-                                    data: categoryData.map(item => item.total),
-                                    backgroundColor: '#166534',
-                                    borderRadius: 12,
-                                    barThickness: 20
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                scales: {
-                                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 9, weight: 'bold' } } },
-                                    x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' } } }
-                                },
-                                plugins: { legend: { display: false } }
-                            }
-                        });
-                    }
-
-                    // --- Graphiques Admin ---
-                    @if(Auth::user()->role === 'admin')
-                    const userRoleData = @json($userRoleData);
-                    const adminRoleCanvas = document.getElementById('adminRoleChart');
-                    if (adminRoleCanvas && userRoleData.length > 0) {
-                        new Chart(adminRoleCanvas.getContext('2d'), {
-                            type: 'polarArea',
-                            data: {
-                                labels: userRoleData.map(item => item.label),
-                                datasets: [{
-                                    data: userRoleData.map(item => item.total),
-                                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1', '#8b5cf6', '#ec4899', '#ef4444'],
-                                    borderWidth: 0
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: { position: 'bottom', labels: { usePointStyle: true, font: { size: 9, weight: 'bold' } } }
-                                }
-                            }
-                        });
-                    }
-
-                    const userStructureData = @json($userStructureData);
-                    const adminStructureCanvas = document.getElementById('adminStructureChart');
-                    if (adminStructureCanvas && userStructureData.length > 0) {
-                        new Chart(adminStructureCanvas.getContext('2d'), {
-                            type: 'bar',
-                            data: {
-                                labels: userStructureData.map(item => item.nom_direction || item.label),
-                                datasets: [{
-                                    label: 'Effectif',
-                                    data: userStructureData.map(item => item.total),
-                                    backgroundColor: '#1e293b',
-                                    borderRadius: 8
-                                }]
-                            },
-                            options: {
-                                indexAxis: 'y',
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                scales: {
-                                    x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                                    y: { grid: { display: false } }
-                                },
-                                plugins: { legend: { display: false } }
-                            }
-                        });
-                    }
-                    @endif
-                });
-            </script>
         </div>
 
         <!-- Colonne Actions Rapides -->
@@ -537,4 +575,226 @@
         </div>
     </div>
     @endif
+    <!-- Scripts pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // =====================================================
+            // CHARTS DR
+            // =====================================================
+            @if(Auth::user()->role === 'DR')
+
+            // -- Chart 1 : Parc par Catégorie (Bar) --
+            const categoryCanvas = document.getElementById('categoryChart');
+            let categoryData = @json($stockParCategorie);
+
+            // Données de démo si le stock est vide
+            if (!categoryData || categoryData.length === 0) {
+                categoryData = [
+                    { categorie: 'Ordinateurs',  total: 42 },
+                    { categorie: 'Imprimantes',  total: 18 },
+                    { categorie: 'Scanners',     total: 9  },
+                    { categorie: 'Serveurs',     total: 5  },
+                    { categorie: 'Onduleurs',    total: 14 },
+                ];
+            }
+
+            if (categoryCanvas) {
+                new Chart(categoryCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: categoryData.map(item => item.categorie || item.label),
+                        datasets: [{
+                            label: 'Unités',
+                            data: categoryData.map(item => item.total),
+                            backgroundColor: ['#166534', '#ea7c2b', '#1e293b', '#10b981', '#6366f1'],
+                            borderRadius: 10,
+                            barThickness: 30
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#f8fafc' }, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } },
+                            x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            // -- Chart 2 : État des Directions (Doughnut) --
+            const healthCanvas = document.getElementById('healthChart');
+            const directionsData = @json($stats['directions_region']->map(fn($d) => $d->health));
+            let healthy = 0, needsAction = 0, unhealthy = 0;
+            directionsData.forEach(h => {
+                if (h === 'healthy') healthy++;
+                else if (h === 'needs_action') needsAction++;
+                else unhealthy++;
+            });
+
+            // Démo si tout vaut 0
+            if (healthy + needsAction + unhealthy === 0) {
+                healthy = 2; needsAction = 2; unhealthy = 1;
+            }
+
+            if (healthCanvas) {
+                new Chart(healthCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Opérationnelles', 'À traiter', 'Urgentes'],
+                        datasets: [{
+                            data: [healthy, needsAction, unhealthy],
+                            backgroundColor: ['#166534', '#ea7c2b', '#ef4444'],
+                            borderWidth: 4,
+                            borderColor: '#ffffff',
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { padding: 16, usePointStyle: true, font: { size: 9, weight: 'bold' }, color: '#475569' }
+                            }
+                        }
+                    }
+                });
+            }
+            @endif
+
+            // --- Charts pour rôles non-DR (Gestionnaire, DSI, SDGRTE, Chef CDI) ---
+            @if(!in_array(Auth::user()->role, ['DR', 'agent', 'admin']))
+            const repartitionData = @json($repartitionStatut);
+            const statusCanvas = document.getElementById('statusChart');
+            // Palette distincte par statut workflow
+            const statusColorMap = {
+                'pre_demande'            : '#3b82f6',
+                'en_attente_dr'          : '#f59e0b',
+                'transmise_gestionnaire' : '#ea7c2b',
+                'proposition_sdgrte'     : '#8b5cf6',
+                'en_attente_dsi'         : '#6366f1',
+                'validee'                : '#166534',
+                'rejetee'                : '#ef4444',
+                'annulee'                : '#94a3b8',
+            };
+            if (statusCanvas && repartitionData.length > 0) {
+                new Chart(statusCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: repartitionData.map(item => item.label),
+                        datasets: [{
+                            data: repartitionData.map(item => item.total),
+                            backgroundColor: repartitionData.map(item => statusColorMap[item.statut] ?? '#94a3b8'),
+                            borderWidth: 3,
+                            borderColor: '#ffffff',
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { padding: 16, usePointStyle: true, font: { size: 9, weight: 'bold' }, color: '#475569' }
+                            }
+                        },
+                        cutout: '72%'
+                    }
+                });
+            }
+
+            const catData2 = @json($stockParCategorie);
+            const catCanvas2 = document.getElementById('categoryChart');
+            if (catCanvas2 && catData2.length > 0) {
+                new Chart(catCanvas2.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: catData2.map(item => item.categorie || item.label),
+                        datasets: [{
+                            label: 'Unités',
+                            data: catData2.map(item => item.total),
+                            backgroundColor: catData2.map((_, i) => {
+                                const pal = ['#166534', '#ea7c2b', '#1e293b', '#10b981', '#6366f1', '#f59e0b'];
+                                return pal[i % pal.length];
+                            }),
+                            borderRadius: 8,
+                            barThickness: 22
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#f8fafc' }, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } },
+                            x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+            @endif
+
+            // --- Graphiques Admin ---
+            @if(Auth::user()->role === 'admin')
+            const userRoleData = @json($userRoleData);
+            const adminRoleCanvas = document.getElementById('adminRoleChart');
+            if (adminRoleCanvas && userRoleData.length > 0) {
+                new Chart(adminRoleCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: userRoleData.map(item => item.label),
+                        datasets: [{
+                            data: userRoleData.map(item => item.total),
+                            backgroundColor: ['#166534', '#ea7c2b', '#1e293b', '#10b981', '#6366f1', '#f59e0b', '#ef4444'],
+                            borderWidth: 3,
+                            borderColor: '#ffffff',
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '72%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true, font: { size: 9, weight: 'bold' }, color: '#475569' } }
+                        }
+                    }
+                });
+            }
+
+            const userStructureData = @json($userStructureData);
+            const adminStructureCanvas = document.getElementById('adminStructureChart');
+            if (adminStructureCanvas && userStructureData.length > 0) {
+                new Chart(adminStructureCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: userStructureData.map(item => item.nom_direction || item.label),
+                        datasets: [{
+                            label: 'Effectif',
+                            data: userStructureData.map(item => item.total),
+                            backgroundColor: '#1e293b',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                            y: { grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+            @endif
+        });
+    </script>
 </x-app-layout>

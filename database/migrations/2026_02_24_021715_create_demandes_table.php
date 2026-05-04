@@ -14,17 +14,8 @@ return new class extends Migration
             $table->integer('quantite')->default(1);
             $table->string('categorie_demandee', 100);
             $table->text('motif_demande');
-            $table->enum('priorite', ['basse', 'normale', 'haute', 'urgente'])->default('normale');
-            $table->enum('statut', [
-                'pre_demande',         
-                'en_attente_dr',       
-                'transmise_gestionnaire', 
-                'proposition_sdrevt',  
-                'en_attente_dsi',      
-                'validee',             
-                'rejetee',             
-                'annulee',             
-            ])->default('pre_demande');
+            $table->string('priorite', 50)->default('normale');
+            $table->string('statut', 50)->default('pre_demande');
             $table->foreignId('id_utilisateur')->constrained('users')->cascadeOnDelete(); 
             $table->foreignId('id_chef_cdi')->nullable()->constrained('users')->nullOnDelete(); 
             $table->text('commentaire_gestionnaire')->nullable();

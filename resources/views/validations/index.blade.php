@@ -54,8 +54,8 @@
                             <td class="px-8 py-6">
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 rounded-full border-2 border-white shadow-sm ring-1 ring-gray-100 overflow-hidden mr-4">
-                                        @if($demande->utilisateur->photo_url)
-                                            <img src="{{ asset('storage/' . $demande->utilisateur->photo_url) }}" class="h-full w-full object-cover">
+                                        @if($demande->utilisateur->photo_path)
+                                            <img src="{{ asset('storage/' . $demande->utilisateur->photo_path) }}" class="h-full w-full object-cover">
                                         @else
                                             <div class="h-full w-full bg-ci-green-dark/5 flex items-center justify-center text-ci-green-dark font-black text-[10px]">
                                                 {{ substr($demande->utilisateur->prenom, 0, 1) }}{{ substr($demande->utilisateur->nom, 0, 1) }}

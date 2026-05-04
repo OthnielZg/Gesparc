@@ -55,9 +55,40 @@ class DashboardController extends Controller
             }
 
             if ($user->role === 'DR') {
-                $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
-                if ($directionId) {
-                    $stats['total_services'] = \App\Models\Service::where('id_direction', $directionId)->count();
+                $villeId = $user->direction?->id_ville;
+                if ($villeId) {
+                    $stats['nom_ville'] = $user->direction?->ville?->nom_ville ?? 'Région';
+                    $stats['total_services'] = \App\Models\Service::whereHas('direction', function($q) use ($villeId) {
+                        $q->where('id_ville', $villeId);
+                    })->count();
+
+                    // --- Consolidated Regional Matrix Data ---
+                    $stats['directions_region'] = \App\Models\Direction::where('id_ville', $villeId)
+                        ->with(['services'])
+                        ->get()
+                        ->map(function($direction) {
+                            $count = Demande::where('statut', 'en_attente_dr')
+                                ->whereHas('utilisateur', fn($q) => $q->where('id_direction', $direction->id))
+                                ->count();
+                            
+                            $direction->attente_validation = $count;
+                            $direction->health = match(true) {
+                                $count > 5 => 'unhealthy', // Rouge
+                                $count > 0 => 'needs_action', // Jaune
+                                default => 'healthy' // Vert
+                            };
+                            return $direction;
+                        });
+
+                    // --- Recent Regional Activity ---
+                    $stats['recent_region'] = Demande::whereHas('utilisateur', function($q) use ($villeId) {
+                            $q->whereHas('direction', fn($dq) => $dq->where('id_ville', $villeId))
+                              ->orWhereHas('bureau.service.direction', fn($dq) => $dq->where('id_ville', $villeId));
+                        })
+                        ->with(['utilisateur'])
+                        ->latest()
+                        ->limit(5)
+                        ->get();
                 }
             }
 
@@ -120,13 +151,30 @@ class DashboardController extends Controller
             $statutQuery->whereHas('utilisateur.bureau', fn($q) => $q->where('id_service', $serviceId));
             $stockQuery->whereHas('affectations.utilisateur.bureau', fn($q) => $q->where('id_service', $serviceId));
         } elseif ($user->role === 'DR') {
-            $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
-            $statutQuery->whereHas('utilisateur.bureau.service', fn($q) => $q->where('id_direction', $directionId));
-            $stockQuery->whereHas('affectations.utilisateur.bureau.service', fn($q) => $q->where('id_direction', $directionId));
+            $villeId = $user->direction?->id_ville;
+            if ($villeId) {
+                // Filtre par Ville (Région)
+                $statutQuery->where(function($q) use ($villeId) {
+                    $q->whereHas('utilisateur.direction', fn($dq) => $dq->where('id_ville', $villeId))
+                      ->orWhereHas('utilisateur.bureau.service.direction', fn($dq) => $dq->where('id_ville', $villeId));
+                });
+                $stockQuery->whereHas('affectations.utilisateur.direction', fn($dq) => $dq->where('id_ville', $villeId))
+                      ->orWhereHas('affectations.utilisateur.bureau.service.direction', fn($dq) => $dq->where('id_ville', $villeId));
+            }
+        } elseif ($user->hasRole(['DSI', 'SDGRTE'])) {
+            $directionId = $user->id_direction;
+            if ($directionId) {
+                // Filtre par Direction uniquement (Bilan)
+                $statutQuery->where(function($q) use ($directionId) {
+                    $q->whereHas('utilisateur.direction', fn($dq) => $dq->where('id_direction', $directionId))
+                      ->orWhereHas('utilisateur.bureau.service.direction', fn($dq) => $dq->where('id_direction', $directionId));
+                });
+                $stockQuery->whereHas('affectations.utilisateur.direction', fn($dq) => $dq->where('id_direction', $directionId))
+                      ->orWhereHas('affectations.utilisateur.bureau.service.direction', fn($dq) => $dq->where('id_direction', $directionId));
+            }
         }
-        // Pour Gestionnaire, SDGRTE, DSI, on garde la vue globale (pas de filtre)
+        // Pour Gestionnaire on garde la vue globale (pas de filtre)
 
-        // 1. Répartition par Statut (Désactivé pour agent)
         $repartitionStatut = collect([]);
         if ($user->role !== 'agent') {
             $repartitionStatut = $statutQuery->select('statut', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
@@ -134,9 +182,9 @@ class DashboardController extends Controller
                 ->get()
                 ->map(function($item) {
                     return [
-                        'label' => $item->statut_label,
-                        'total' => $item->total,
-                        'color' => $item->statut_color_hex
+                        'statut' => $item->statut,
+                        'label'  => $item->statut_label,
+                        'total'  => $item->total,
                     ];
                 });
         }
@@ -174,19 +222,17 @@ class DashboardController extends Controller
             $query = Demande::where('statut', $targetStatus);
             
             if ($user->hasRole('DR')) {
-                $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
+                $villeId = $user->direction?->id_ville;
                 
-                if ($directionId) {
-                    $direction = \App\Models\Direction::find($directionId);
-                    $idVille = $direction?->id_ville;
-
-                    if ($idVille) {
-                        $query->whereHas('utilisateur.bureau.service.direction', function ($q) use ($idVille) {
-                            $q->where('id_ville', $idVille);
+                if ($villeId) {
+                    $query->where(function ($q) use ($villeId) {
+                        $q->whereHas('utilisateur.direction', function ($dq) use ($villeId) {
+                            $dq->where('id_ville', $villeId);
+                        })
+                        ->orWhereHas('utilisateur.bureau.service.direction', function ($dq) use ($villeId) {
+                            $dq->where('id_ville', $villeId);
                         });
-                    } else {
-                        $query->where('id_utilisateur', $user->id);
-                    }
+                    });
                 } else {
                     $query->where('id_utilisateur', $user->id);
                 }

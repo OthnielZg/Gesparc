@@ -35,20 +35,19 @@ class ValidationController extends Controller
             ->with(['utilisateur.bureau.service', 'validations.utilisateur']);
 
         if ($user->hasRole('DR')) {
-            $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
+            $villeId = $user->direction?->id_ville;
             
-            if ($directionId) {
-                $query->where(function ($q) use ($user, $directionId) {
-                    $q->where('id_utilisateur', $user->id)
-                      ->orWhereHas('utilisateur.bureau.service', function ($sq) use ($directionId) {
-                          $sq->where('id_direction', $directionId);
-                      })
-                      ->orWhereHas('utilisateur', function ($uq) use ($directionId) {
-                          $uq->where('id_direction', $directionId);
-                      });
+            if ($villeId) {
+                $query->where(function ($q) use ($villeId) {
+                    $q->whereHas('utilisateur.direction', function ($dq) use ($villeId) {
+                        $dq->where('id_ville', $villeId);
+                    })
+                    ->orWhereHas('utilisateur.bureau.service.direction', function ($dq) use ($villeId) {
+                        $dq->where('id_ville', $villeId);
+                    });
                 });
             } else {
-                $query->where('id_utilisateur', $user->id); // Fallback
+                $query->where('id_utilisateur', $user->id);
             }
         }
 

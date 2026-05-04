@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::table('demandes', function (Blueprint $table) {
             // ── Étape 5 : Champs SDREVT ──────────────────────────────────
             // Décision du SDREVT : valide la proposition SEDMI ou contre-propose
-            $table->enum('decision_sdrevt', ['valide_sedmi', 'contre_propose'])
+            $table->string('decision_sdrevt', 50)
                 ->nullable()
                 ->after('materiel_propose');
 
@@ -32,7 +32,7 @@ return new class extends Migration
 
             // ── Étape 6 : Champs DSI ─────────────────────────────────────
             // Choix final du DSI
-            $table->enum('decision_dsi', ['retient_sedmi', 'retient_sdrevt', 'autre'])
+            $table->string('decision_dsi', 50)
                 ->nullable()
                 ->after('reference_contre_propose');
 
@@ -45,25 +45,6 @@ return new class extends Migration
             $table->text('commentaire_dsi')
                 ->nullable()
                 ->after('materiel_retenu_dsi');
-        });
-
-        // ── Mise à jour des statuts de la table demandes ─────────────────
-        // Ajout de 'validee_dsi' et 'en_finalisation' comme nouveaux statuts
-        // SQLite ne supporte pas ALTER COLUMN sur enum,
-        // donc on modifie via une colonne temporaire
-        Schema::table('demandes', function (Blueprint $table) {
-            $table->string('statut_new', 50)->default('pre_demande')->after('statut');
-        });
-
-        // Copier les valeurs existantes
-        \Illuminate\Support\Facades\DB::statement('UPDATE demandes SET statut_new = statut');
-
-        Schema::table('demandes', function (Blueprint $table) {
-            $table->dropColumn('statut');
-        });
-
-        Schema::table('demandes', function (Blueprint $table) {
-            $table->renameColumn('statut_new', 'statut');
         });
     }
 

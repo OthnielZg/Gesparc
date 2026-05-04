@@ -23,9 +23,7 @@ class DemandeController extends Controller
             $query->where('id_utilisateur', $user->id);
         } elseif ($user->hasRole(['chef_cdi'])) {
             $idService = $user->bureau?->id_service;
-
             if ($idService) {
-                // Chef avec bureau configuré : voir les demandes de son service
                 $query->where(function ($q) use ($user, $idService) {
                     $q->where('id_utilisateur', $user->id)
                       ->orWhereHas('utilisateur.bureau', function ($bureauQuery) use ($idService) {
@@ -33,25 +31,26 @@ class DemandeController extends Controller
                       });
                 });
             } else {
-                // Chef sans bureau : voir ses propres demandes + toutes les pre-demandes du système
-                // (cas transitoire pendant la configuration des bureaux)
-                $query->where(function ($q) use ($user) {
-                    $q->where('id_utilisateur', $user->id)
-                      ->orWhere('statut', 'pre_demande');
-                });
+                $query->where('id_utilisateur', $user->id);
             }
         } elseif ($user->hasRole(['DR'])) {
-            $directionId = $user->id_direction ?? $user->bureau?->service?->id_direction;
-            
+            // DR : Vue sur toute la ville/région
+            $villeId = $user->direction?->id_ville;
+            if ($villeId) {
+                $query->where(function ($q) use ($villeId) {
+                    $q->whereHas('utilisateur.direction', fn($dq) => $dq->where('id_ville', $villeId))
+                      ->orWhereHas('utilisateur.bureau.service.direction', fn($dq) => $dq->where('id_ville', $villeId));
+                });
+            } else {
+                $query->where('id_utilisateur', $user->id);
+            }
+        } elseif ($user->hasRole(['DSI', 'SDGRTE'])) {
+            // Directeur Central (DSI/SDGRTE) : Vue uniquement sur sa propre direction (Bilan)
+            $directionId = $user->id_direction;
             if ($directionId) {
-                $query->where(function ($q) use ($user, $directionId) {
-                    $q->where('id_utilisateur', $user->id)
-                      ->orWhereHas('utilisateur.bureau.service', function ($sq) use ($directionId) {
-                          $sq->where('id_direction', $directionId);
-                      })
-                      ->orWhereHas('utilisateur', function ($uq) use ($directionId) {
-                          $uq->where('id_direction', $directionId);
-                      });
+                $query->where(function ($q) use ($directionId) {
+                    $q->whereHas('utilisateur.direction', fn($dq) => $dq->where('id_direction', $directionId))
+                      ->orWhereHas('utilisateur.bureau.service.direction', fn($dq) => $dq->where('id_direction', $directionId));
                 });
             } else {
                 $query->where('id_utilisateur', $user->id);
